@@ -2,8 +2,15 @@ package com.backend.ims;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@ComponentScan(basePackages = {
+	"com.backend.ims",
+	"com.backend.ims.data",
+	"com.backend.ims.general"
+})
 public class ImsApplication {
 
 	public static void main(String[] args) {

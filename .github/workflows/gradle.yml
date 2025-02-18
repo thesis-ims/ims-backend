@@ -38,3 +38,5 @@ jobs:
           distribution: 'temurin'
       - name: Generate and Submit Dependency Graph
         uses: gradle/actions/dependency-submission@v4
+        with:
+          token: ${{ secrets.PAT }}

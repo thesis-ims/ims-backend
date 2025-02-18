@@ -1,4 +1,4 @@
-package com.backend.ims.config;
+package com.backend.ims.application.config;
 
 import com.backend.ims.general.util.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;

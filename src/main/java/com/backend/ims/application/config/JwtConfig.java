@@ -1,4 +1,4 @@
-package com.backend.ims.config;
+package com.backend.ims.application.config;
 
 import com.backend.ims.general.util.JwtFilter;
 import com.backend.ims.general.util.JwtUtil;

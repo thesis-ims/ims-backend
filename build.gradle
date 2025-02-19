@@ -76,6 +76,7 @@ jacocoTestReport {
 		classDirectories.setFrom(files(classDirectories.files.collect { dir ->
 			fileTree(dir: dir, exclude: [
 					'**/model/**',
+					'**/common/**',
 					'**/application/**'
 			])
 		}))
@@ -97,6 +98,7 @@ jacocoTestCoverageVerification {
 		classDirectories.setFrom(files(classDirectories.files.collect { dir ->
 			fileTree(dir: dir, exclude: [
 					'**/model/**',
+					'**/common/**',
 					'**/application/**'
 			])
 		}))

@@ -1,6 +1,6 @@
 package com.backend.ims.general.util;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.testng.Assert;
@@ -8,12 +8,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Date;
+import java.util.List;
 
 @Test
 public class JwtUtilTest {
-  public static final String USERNAME = "testUser";
-  private JwtUtil jwtUtil;
+  private static final String USERNAME = "testUser";
+  private static final List<String> ROLES = List.of("ROLE_USER");
   private static final String SECRET_KEY = "dGhpcyBzdHJpbmcgdGhpcyBzdHJpbmcgdGhpcyBzdHJpbmcgdGhpcyBzdHJpbmcgdGhpcyBzdHJpbmc=";
+
+  private JwtUtil jwtUtil;
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() {
@@ -23,6 +26,7 @@ public class JwtUtilTest {
   private String generateExpiredToken(String username) {
     return Jwts.builder()
       .setSubject(username)
+      .claim("roles", ROLES)
       .setExpiration(new Date(System.currentTimeMillis() - 1000))
       .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
       .compact();
@@ -31,7 +35,7 @@ public class JwtUtilTest {
   @Test
   public void testGenerateToken() {
     try {
-      String token = jwtUtil.generateToken(USERNAME);
+      String token = jwtUtil.generateToken(USERNAME, ROLES);
       Assert.assertNotNull(token);
     } catch (Exception e) {
       Assert.fail("Exception thrown while generating token");
@@ -39,18 +43,15 @@ public class JwtUtilTest {
   }
 
   @Test
-  public void testGenerateToken_Failure() {
-    try {
-      jwtUtil.generateToken(null);
-    } catch (Exception e) {
-      Assert.fail("Exception thrown while generating token");
-    }
+  public void testGenerateToken_WithNullUsername() {
+    String token = jwtUtil.generateToken(null, ROLES);
+    Assert.assertNotNull(token); // JWT allows null subject
   }
 
   @Test
   public void testExtractUsername() {
     try {
-      String token = jwtUtil.generateToken(USERNAME);
+      String token = jwtUtil.generateToken(USERNAME, ROLES);
       String extractedUsername = jwtUtil.extractUsername(token);
       Assert.assertEquals(extractedUsername, USERNAME);
     } catch (Exception e) {
@@ -59,9 +60,17 @@ public class JwtUtilTest {
   }
 
   @Test
+  public void testExtractRoles() {
+    String token = jwtUtil.generateToken(USERNAME, ROLES);
+    Claims claims = jwtUtil.extractClaims(token);
+    List<String> extractedRoles = claims.get("roles", List.class);
+    Assert.assertEquals(extractedRoles, ROLES);
+  }
+
+  @Test
   public void testTokenExpiration() {
     try {
-      String token = jwtUtil.generateToken(USERNAME);
+      String token = jwtUtil.generateToken(USERNAME, ROLES);
       boolean isExpired = jwtUtil.isTokenExpired(token);
       Assert.assertFalse(isExpired);
     } catch (Exception e) {
@@ -72,7 +81,7 @@ public class JwtUtilTest {
   @Test
   public void testValidateToken() {
     try {
-      String token = jwtUtil.generateToken(USERNAME);
+      String token = jwtUtil.generateToken(USERNAME, ROLES);
       boolean isValid = jwtUtil.validateToken(token, USERNAME);
       Assert.assertTrue(isValid);
     } catch (Exception e) {
@@ -93,12 +102,8 @@ public class JwtUtilTest {
   @Test
   public void testExtractClaimsWithExpiredToken() {
     String expiredToken = generateExpiredToken(USERNAME);
-
-    try {
-      jwtUtil.extractClaims(expiredToken);
-    } catch (ExpiredJwtException e) {
-      Assert.assertNotNull(e.getClaims());
-    }
+    Claims claims = jwtUtil.extractClaims(expiredToken);
+    Assert.assertEquals(claims.getSubject(), USERNAME);
   }
 
   @Test
@@ -109,5 +114,12 @@ public class JwtUtilTest {
     } catch (Exception e) {
       Assert.fail("Exception thrown while checking invalid token expiration");
     }
+  }
+
+  @Test
+  public void testValidateToken_InvalidUsername() {
+    String token = jwtUtil.generateToken(USERNAME, ROLES);
+    boolean isValid = jwtUtil.validateToken(token, "wrongUser");
+    Assert.assertFalse(isValid);
   }
 }

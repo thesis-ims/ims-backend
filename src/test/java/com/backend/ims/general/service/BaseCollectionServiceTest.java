@@ -121,6 +121,40 @@ public class BaseCollectionServiceTest {
 
     Assert.assertEquals(actualCriteria, expectedCriteria);
   }
+
+  @Test
+  void isExist_WhenDocumentExists_ReturnsTrue() {
+    String key = "email";
+    String value = "test@example.com";
+    Mockito.when(mongoTemplate.exists(Mockito.any(Query.class), Mockito.eq(User.class))).thenReturn(true);
+    boolean result = service.isExist(key, value);
+
+    Assert.assertTrue(result);
+    ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+    Mockito.verify(mongoTemplate).exists(queryCaptor.capture(), Mockito.eq(User.class));
+
+    Query capturedQuery = queryCaptor.getValue();
+    Document criteria = capturedQuery.getQueryObject();
+
+    Assert.assertEquals(value, criteria.get(key));
+  }
+
+  @Test
+  void isExist_WhenDocumentDoesNotExist_ReturnsFalse() {
+    String key = "username";
+    String value = "nonexistentUser";
+    Mockito.when(mongoTemplate.exists(Mockito.any(Query.class), Mockito.eq(User.class))).thenReturn(false);
+    boolean result = service.isExist(key, value);
+
+    Assert.assertFalse(result);
+    ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+    Mockito.verify(mongoTemplate).exists(queryCaptor.capture(), Mockito.eq(User.class));
+
+    Query capturedQuery = queryCaptor.getValue();
+    Document criteria = capturedQuery.getQueryObject();
+
+    Assert.assertEquals(value, criteria.get(key));
+  }
   private static class User {
   }
 }

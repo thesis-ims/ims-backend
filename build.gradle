@@ -2,6 +2,7 @@ plugins {
 	id "java"
 	id "org.springframework.boot" version "3.4.2"
 	id "io.spring.dependency-management" version "1.1.7"
+	id "jacoco"
 }
 
 group = "com.backend"
@@ -24,8 +25,10 @@ repositories {
 }
 
 dependencies {
-	testImplementation "org.testng:testng:7.7.1"
-	testRuntimeOnly "org.testng:testng:7.7.1"
+	testImplementation "org.testng:testng:$testng_version"
+	testImplementation "org.springframework:spring-test:$spring_test_version"
+	testImplementation "org.mockito:mockito-core:$mockito_version"
+	testRuntimeOnly "org.testng:testng:$testng_version"
 	implementation "org.springframework.boot:spring-boot-starter-data-mongodb"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
 	implementation "org.springframework.boot:spring-boot-starter-security"
@@ -56,3 +59,48 @@ dependencyManagement {
 test {
 	useTestNG()
 }
+
+jacoco {
+	toolVersion = "0.8.11"
+	reportsDirectory = layout.buildDirectory.dir('jacocoReports')
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+	afterEvaluate {
+		// Exclude any classes in packages that contain 'model' or 'config'
+		classDirectories.setFrom(files(classDirectories.files.collect { dir ->
+			fileTree(dir: dir, exclude: [
+					'**/model/**',
+					'**/application/**'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.8
+			}
+		}
+	}
+	afterEvaluate {
+		// Exclude any classes in packages that contain 'model' or 'config'
+		classDirectories.setFrom(files(classDirectories.files.collect { dir ->
+			fileTree(dir: dir, exclude: [
+					'**/model/**',
+					'**/application/**'
+			])
+		}))
+	}
+}
+
+check.dependsOn jacocoTestCoverageVerification

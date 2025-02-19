@@ -1,6 +1,7 @@
 package com.backend.ims.general.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,9 @@ public class JwtUtil {
         .build()
         .parseClaimsJws(token)
         .getBody();
+    } catch (ExpiredJwtException e) {
+      return e.getClaims();
     } catch (Exception e) {
-      e.printStackTrace();
       throw new RuntimeException("Error extracting claims", e);
     }
   }
@@ -44,7 +46,12 @@ public class JwtUtil {
   }
 
   public boolean isTokenExpired(String token) {
-    return extractClaims(token).getExpiration().before(new Date());
+    try {
+      Claims claims = extractClaims(token);
+      return claims.getExpiration().before(new Date());
+    } catch (RuntimeException e) {
+      return true;
+    }
   }
 
   public boolean validateToken(String token, String username) {

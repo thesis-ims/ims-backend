@@ -72,7 +72,7 @@ jacocoTestReport {
 		html.required.set(true)
 	}
 	afterEvaluate {
-		// Exclude any classes in packages that contain 'model' or 'config'
+		// Exclude any classes in packages that contain 'model' or 'application'
 		classDirectories.setFrom(files(classDirectories.files.collect { dir ->
 			fileTree(dir: dir, exclude: [
 					'**/model/**',
@@ -93,7 +93,7 @@ jacocoTestCoverageVerification {
 		}
 	}
 	afterEvaluate {
-		// Exclude any classes in packages that contain 'model' or 'config'
+		// Exclude any classes in packages that contain 'model' or 'application'
 		classDirectories.setFrom(files(classDirectories.files.collect { dir ->
 			fileTree(dir: dir, exclude: [
 					'**/model/**',

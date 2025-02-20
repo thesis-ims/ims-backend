@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
       userAccessor.saveItem(user);
       return ResponseEntity.ok(new BaseResponse<>("User registered successfully!"));
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new BaseResponse<>(e.getMessage()));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }
   }
 
@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
       String token = jwtUtil.generateToken(user.getUsername(), user.getRoles());
       return ResponseEntity.ok(new AuthResponse(token));
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new BaseResponse<>(e.getMessage()));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }
   }
 }

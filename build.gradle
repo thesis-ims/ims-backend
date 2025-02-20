@@ -107,4 +107,9 @@ jacocoTestCoverageVerification {
 	}
 }
 
+jar {
+	enabled = false
+}
+
+
 check.dependsOn jacocoTestCoverageVerification

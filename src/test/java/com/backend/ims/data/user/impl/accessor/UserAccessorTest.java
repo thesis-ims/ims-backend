@@ -21,7 +21,7 @@ public class UserAccessorTest {
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.openMocks(this);
   }
 
   @Test

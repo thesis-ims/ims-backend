@@ -45,5 +45,10 @@ public abstract class BaseCollectionService<T> {
     return result;
   }
 
+  public boolean isExist(String key, String value) {
+    Query query = new Query(Criteria.where(key).is(value));
+    return getMongoTemplate().exists(query, getEntityClass());
+  }
+
   protected abstract Class<T> getEntityClass();
 }

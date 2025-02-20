@@ -2,20 +2,20 @@ spring:
   application:
     name: ims
   mail:
-    host: ${SPRING_MAIL_HOST}
-    port: ${SPRING_MAIL_PORT}
-    username: ${SPRING_MAIL_USERNAME}
-    password: ${SPRING_MAIL_PASSWORD}
+    host: ${spring.mail.host}
+    port: ${spring.mail.port}
+    username: ${spring.mail.username}
+    password: ${spring.mail.password}
     properties:
       mail:
         smtp:
-          auth: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH}
+          auth: ${spring.mail.properties.mail.smtp.auth}
           starttls:
-            enable: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}
+            enable: ${spring.mail.properties.mail.smtp.starttls.enable}
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI}
-      database: ${SPRING_DATA_MONGODB_DATABASE}
+      uri: ${spring.data.mongodb.uri}
+      database: ${spring.data.mongodb.database}
 server:
   port: 8080
 logging:

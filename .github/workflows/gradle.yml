@@ -133,14 +133,20 @@ jobs:
         with:
           name: java-app
           path: build/libs/
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Upload JAR to EC2
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "build/libs/*.jar"
           target: "/tmp/"
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo systemctl stop myapp.service
             sudo cp /tmp/*.jar /app/myapp.jar

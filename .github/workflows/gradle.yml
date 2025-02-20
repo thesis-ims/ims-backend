@@ -149,6 +149,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo systemctl stop myapp.service
-            sudo cp /tmp/*.jar /app/myapp.jar
+            sudo cp /tmp/build/libs/*.jar /app/myapp.jar
             sudo systemctl daemon-reload
             sudo systemctl start myapp.service

@@ -5,7 +5,9 @@ import com.backend.ims.data.user.api.model.User;
 import com.backend.ims.data.user.api.model.request.LoginRequest;
 import com.backend.ims.data.user.api.model.request.RegistrationRequest;
 import com.backend.ims.data.user.api.model.response.AuthResponse;
+import com.backend.ims.data.user.api.service.AuthService;
 import com.backend.ims.data.user.impl.accessor.UserAccessor;
+import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.util.JwtUtil;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -31,7 +33,7 @@ public class AuthServiceImplTest {
   @Mock
   private JwtUtil jwtUtil;
 
-  private AuthServiceImpl authService;
+  private AuthService authService;
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() {
@@ -49,7 +51,7 @@ public class AuthServiceImplTest {
       .thenReturn(true);
     ResponseEntity<?> response = authService.register(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-    Assert.assertEquals(response.getBody(), "Error: Username is already taken!");
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: Username is already taken!");
     Mockito.verify(userAccessor, Mockito.never()).saveItem(Mockito.any());
   }
 
@@ -65,7 +67,7 @@ public class AuthServiceImplTest {
       .thenReturn(true);
     ResponseEntity<?> response = authService.register(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-    Assert.assertEquals(response.getBody(), "Error: Email is already in use!");
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: Email is already in use!");
     Mockito.verify(userAccessor, Mockito.never()).saveItem(Mockito.any());
   }
 
@@ -80,7 +82,7 @@ public class AuthServiceImplTest {
     Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn("encodedPassword");
     ResponseEntity<?> response = authService.register(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
-    Assert.assertEquals(response.getBody(), "User registered successfully!");
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "User registered successfully!");
     Mockito.verify(userAccessor).saveItem(Mockito.argThat(user ->
       user.getUsername().equals("newUser") &&
         user.getPassword().equals("encodedPassword")
@@ -103,7 +105,7 @@ public class AuthServiceImplTest {
     Mockito.when(userAccessor.getByFilter(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
     ResponseEntity<?> response = authService.authenticate(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
-    Assert.assertEquals(response.getBody(), "Error: User is not valid!");
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: User is not valid!");
   }
 
   @Test
@@ -120,7 +122,7 @@ public class AuthServiceImplTest {
     Mockito.when(userAccessor.getByFilter(Mockito.anyString(), Mockito.anyString())).thenReturn(user);
     ResponseEntity<?> response = authService.authenticate(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
-    Assert.assertEquals(response.getBody(), "Error: Please verify your account by email!");
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: Please verify your account by email!");
   }
 
   @Test
@@ -139,7 +141,7 @@ public class AuthServiceImplTest {
     Mockito.when(passwordEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
     ResponseEntity<?> response = authService.authenticate(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
-    Assert.assertEquals(response.getBody(), "Error: Invalid credentials!");
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: Invalid credentials!");
   }
 
   @Test

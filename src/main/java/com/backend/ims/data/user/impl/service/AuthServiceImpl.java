@@ -7,6 +7,7 @@ import com.backend.ims.data.user.api.model.request.RegistrationRequest;
 import com.backend.ims.data.user.api.model.response.AuthResponse;
 import com.backend.ims.data.user.api.service.AuthService;
 import com.backend.ims.data.user.impl.accessor.UserAccessor;
+import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,13 +40,13 @@ public class AuthServiceImpl implements AuthService {
       if (userAccessor.isExist(UserCommon.USERNAME, request.getUsername())) {
         return ResponseEntity
           .badRequest()
-          .body("Error: Username is already taken!");
+          .body(new BaseResponse<>("Error: Username is already taken!"));
       }
 
       if (userAccessor.isExist(UserCommon.EMAIL, request.getEmail())) {
         return ResponseEntity
           .badRequest()
-          .body("Error: Email is already in use!");
+          .body(new BaseResponse<>("Error: Email is already in use!"));
       }
 
       User user = User.builder()
@@ -62,9 +63,9 @@ public class AuthServiceImpl implements AuthService {
         .build();
 
       userAccessor.saveItem(user);
-      return ResponseEntity.ok("User registered successfully!");
+      return ResponseEntity.ok(new BaseResponse<>("User registered successfully!"));
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new BaseResponse<>(e.getMessage()));
     }
   }
 
@@ -75,23 +76,23 @@ public class AuthServiceImpl implements AuthService {
       if (user == null) {
         return ResponseEntity
           .status(HttpStatus.UNAUTHORIZED)
-          .body("Error: User is not valid!");
+          .body(new BaseResponse<>("Error: User is not valid!"));
       } else if (!user.isEnabled()) {
         return ResponseEntity
           .status(HttpStatus.UNAUTHORIZED)
-          .body("Error: Please verify your account by email!");
+          .body(new BaseResponse<>("Error: Please verify your account by email!"));
       }
 
       if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
         return ResponseEntity
           .status(HttpStatus.UNAUTHORIZED)
-          .body("Error: Invalid credentials!");
+          .body(new BaseResponse<>("Error: Invalid credentials!"));
       }
 
       String token = jwtUtil.generateToken(user.getUsername(), user.getRoles());
       return ResponseEntity.ok(new AuthResponse(token));
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new BaseResponse<>(e.getMessage()));
     }
   }
 }

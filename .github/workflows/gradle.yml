@@ -126,29 +126,18 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: java-app
+          name: build-output
           path: build/libs/
       - name: Deploy to EC2
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-        run: |
-          # Set up SSH environment
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/ec2_key
-          chmod 600 ~/.ssh/ec2_key
-          
-          # Add EC2 to known hosts
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-          
-          # Copy JAR file
-          scp -i ~/.ssh/ec2_key \
-            build/libs/*.jar \
-            ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/tmp/
-          
-          # Execute remote commands
-          ssh -i ~/.ssh/ec2_key \
-            ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
-            "sudo systemctl stop myapp.service && \
-             sudo cp /tmp/*.jar /app/myapp.jar && \
-             sudo systemctl daemon-reload && \
-             sudo systemctl start myapp.service"
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo systemctl stop myapp.service
+            sudo cp /tmp/*.jar /app/myapp.jar
+            sudo systemctl daemon-reload
+            sudo systemctl start myapp.service
+          scp: |
+            build/libs/*.jar:/tmp/

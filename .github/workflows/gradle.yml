@@ -139,10 +139,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          scp: |
-            build/libs/*.jar:/tmp/
+          source: "build/libs/*.jar"
+          target: "/tmp/"
           script: |
             sudo systemctl stop myapp.service
-            sudo cp /tmp/ims-*.jar /app/myapp.jar
+            sudo cp /tmp/*.jar /app/myapp.jar
             sudo systemctl daemon-reload
             sudo systemctl start myapp.service

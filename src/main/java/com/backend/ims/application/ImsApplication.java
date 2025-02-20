@@ -3,12 +3,10 @@ package com.backend.ims.application;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication(exclude = {
-	DataSourceAutoConfiguration.class,
-	MailSenderAutoConfiguration.class
+	DataSourceAutoConfiguration.class
 })
 @ComponentScan(basePackages = {
 	"com.backend.ims",

@@ -35,55 +35,63 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public ResponseEntity<?> register(RegistrationRequest request) {
-    if (userAccessor.isExist(UserCommon.USERNAME, request.getUsername())) {
-      return ResponseEntity
-        .badRequest()
-        .body("Error: Username is already taken!");
+    try {
+      if (userAccessor.isExist(UserCommon.USERNAME, request.getUsername())) {
+        return ResponseEntity
+          .badRequest()
+          .body("Error: Username is already taken!");
+      }
+
+      if (userAccessor.isExist(UserCommon.EMAIL, request.getEmail())) {
+        return ResponseEntity
+          .badRequest()
+          .body("Error: Email is already in use!");
+      }
+
+      User user = User.builder()
+        .id(UUID.randomUUID().toString())
+        .email(request.getEmail())
+        .username(request.getUsername())
+        .password(passwordEncoder.encode(request.getPassword()))
+        .gender(request.getGender())
+        .phoneNumber(request.getPhoneNumber())
+        .dob(request.getDob())
+        .createdDate(System.currentTimeMillis())
+        .enabled(true) // TODO: Need to add capability to confirm via email, make false after we have capability
+        .roles(List.of("ROLE_USER"))
+        .build();
+
+      userAccessor.saveItem(user);
+      return ResponseEntity.ok("User registered successfully!");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
     }
-
-    if (userAccessor.isExist(UserCommon.EMAIL, request.getEmail())) {
-      return ResponseEntity
-        .badRequest()
-        .body("Error: Email is already in use!");
-    }
-
-    User user = User.builder()
-      .id(UUID.randomUUID().toString())
-      .email(request.getEmail())
-      .username(request.getUsername())
-      .password(passwordEncoder.encode(request.getPassword()))
-      .gender(request.getGender())
-      .phoneNumber(request.getPhoneNumber())
-      .dob(request.getDob())
-      .createdDate(System.currentTimeMillis())
-      .enabled(true) // TODO: Need to add capability to confirm via email, make false after we have capability
-      .roles(List.of("ROLE_USER"))
-      .build();
-
-    userAccessor.saveItem(user);
-    return ResponseEntity.ok("User registered successfully!");
   }
 
   @Override
   public ResponseEntity<?> authenticate(LoginRequest request) {
-    User user = userAccessor.getByFilter(UserCommon.USERNAME, request.getUsername());
-    if (user == null) {
-      return ResponseEntity
-        .status(HttpStatus.UNAUTHORIZED)
-        .body("Error: User is not valid!");
-    } else if (!user.isEnabled()) {
-      return ResponseEntity
-        .status(HttpStatus.UNAUTHORIZED)
-        .body("Error: Please verify your account by email!");
-    }
+    try {
+      User user = userAccessor.getByFilter(UserCommon.USERNAME, request.getUsername());
+      if (user == null) {
+        return ResponseEntity
+          .status(HttpStatus.UNAUTHORIZED)
+          .body("Error: User is not valid!");
+      } else if (!user.isEnabled()) {
+        return ResponseEntity
+          .status(HttpStatus.UNAUTHORIZED)
+          .body("Error: Please verify your account by email!");
+      }
 
-    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-      return ResponseEntity
-        .status(HttpStatus.UNAUTHORIZED)
-        .body("Error: Invalid credentials!");
-    }
+      if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        return ResponseEntity
+          .status(HttpStatus.UNAUTHORIZED)
+          .body("Error: Invalid credentials!");
+      }
 
-    String token = jwtUtil.generateToken(user.getUsername(), user.getRoles());
-    return ResponseEntity.ok(new AuthResponse(token));
+      String token = jwtUtil.generateToken(user.getUsername(), user.getRoles());
+      return ResponseEntity.ok(new AuthResponse(token));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+    }
   }
 }

@@ -88,6 +88,13 @@ public class AuthServiceImplTest {
   }
 
   @Test
+  public void testRegister_Exception() {
+    Mockito.when(userAccessor.saveItem(Mockito.any())).thenThrow(RuntimeException.class);
+    ResponseEntity<?> response = authService.register(new RegistrationRequest());
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_GATEWAY);
+  }
+
+  @Test
   public void testAuthenticate_UserNull() {
     LoginRequest request = new LoginRequest();
     request.setUsername("validUser");
@@ -157,4 +164,10 @@ public class AuthServiceImplTest {
     Mockito.verify(jwtUtil).generateToken(Mockito.eq("validUser"), Mockito.eq(List.of("ROLE_USER")));
   }
 
+  @Test
+  public void testAuthenticate_Exception() {
+    Mockito.when(userAccessor.getByFilter(Mockito.any(), Mockito.any())).thenThrow(RuntimeException.class);
+    ResponseEntity<?> response = authService.authenticate(new LoginRequest());
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_GATEWAY);
+  }
 }

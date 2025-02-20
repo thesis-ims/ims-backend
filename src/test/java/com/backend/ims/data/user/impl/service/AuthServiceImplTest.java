@@ -93,7 +93,7 @@ public class AuthServiceImplTest {
   public void testRegister_Exception() {
     Mockito.when(userAccessor.saveItem(Mockito.any())).thenThrow(RuntimeException.class);
     ResponseEntity<?> response = authService.register(new RegistrationRequest());
-    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_GATEWAY);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @Test
@@ -170,6 +170,6 @@ public class AuthServiceImplTest {
   public void testAuthenticate_Exception() {
     Mockito.when(userAccessor.getByFilter(Mockito.any(), Mockito.any())).thenThrow(RuntimeException.class);
     ResponseEntity<?> response = authService.authenticate(new LoginRequest());
-    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_GATEWAY);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

@@ -147,6 +147,7 @@ public class AuthServiceImplTest {
   @Test
   public void testAuthenticate_Success() {
     User user = User.builder()
+      .id("DUMMY_ID")
       .username("validUser")
       .password("encodedPassword")
       .enabled(true)
@@ -162,7 +163,7 @@ public class AuthServiceImplTest {
 
     ResponseEntity<?> response = authService.authenticate(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
-    Assert.assertEquals(((AuthResponse) response.getBody()).getToken(), "jwtToken");
+    Assert.assertEquals(((BaseResponse<AuthResponse>) response.getBody()).getData().getToken(), "jwtToken");
     Mockito.verify(jwtUtil).generateToken(Mockito.eq("validUser"), Mockito.eq(List.of("ROLE_USER")));
   }
 

@@ -147,6 +147,7 @@ public class AuthServiceImplTest {
   @Test
   public void testAuthenticate_Success() {
     User user = User.builder()
+      .id("DUMMY_ID")
       .username("validUser")
       .password("encodedPassword")
       .enabled(true)

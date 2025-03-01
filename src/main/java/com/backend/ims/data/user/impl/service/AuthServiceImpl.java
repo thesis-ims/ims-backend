@@ -54,8 +54,8 @@ public class AuthServiceImpl implements AuthService {
         .email(request.getEmail())
         .username(request.getUsername())
         .password(passwordEncoder.encode(request.getPassword()))
-        .gender(request.getGender())
-        .phoneNumber(request.getPhoneNumber())
+        .gender(request.getGender() == null ? "Other" : request.getGender())
+        .phoneNumber(request.getPhoneNumber() == null ? "" : request.getPhoneNumber())
         .dob(request.getDob())
         .createdDate(System.currentTimeMillis())
         .enabled(true) // TODO: Need to add capability to confirm via email, make false after we have capability
@@ -90,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
       }
 
       String token = jwtUtil.generateToken(user.getUsername(), user.getRoles());
-      return ResponseEntity.ok(new AuthResponse(token));
+      return ResponseEntity.ok(new BaseResponse<>(new AuthResponse(user.getId(), token)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }

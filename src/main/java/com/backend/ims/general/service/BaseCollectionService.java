@@ -38,11 +38,8 @@ public abstract class BaseCollectionService<T> {
 
   public T getByFilter(String key, String value) {
     Query query = new Query(Criteria.where(key).is(value));
-    logger.info("Executing query: {}", query);
 
-    T result = getMongoTemplate().findOne(query, getEntityClass(), getCollectionName());
-    logger.info("Query result: {}", result);
-    return result;
+    return getMongoTemplate().findOne(query, getEntityClass(), getCollectionName());
   }
 
   public boolean isExist(String key, String value) {

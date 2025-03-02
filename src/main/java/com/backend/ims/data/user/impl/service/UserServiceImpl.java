@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public ResponseEntity<?> getUserById(UserRequest request) {
     try {
-      if (request.getUserId() == null) {
+      if (request == null || request.getUserId() == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>("Error: Request is null!"));
       }
       User user = userAccessor.getItemById(request.getUserId());
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public ResponseEntity<?> updateUser(UserRequest request) {
     try {
-      if (request.getUserId() == null) {
+      if (request == null || request.getUserId() == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>("Error: Request is null!"));
       }
       User user = userAccessor.getItemById(request.getUserId());
@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public ResponseEntity<?> deleteUser(UserRequest request) {
     try {
-      if (request.getUserId() == null) {
+      if (request == null || request.getUserId() == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>("Error: Request is null!"));
       }
       userAccessor.deleteItem(request.getUserId());
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public ResponseEntity<?> updateUserRole(UpdateRoleRequest request) {
     try {
-      if (request.getUserId() == null) {
+      if (request == null || request.getUserId() == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>("Error: Request is null!"));
       }
       User user = userAccessor.getItemById(request.getUserId());

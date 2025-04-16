@@ -122,35 +122,3 @@ jobs:
         uses: gradle/actions/dependency-submission@v4
         with:
           token: ${{ secrets.PAT }}
-
-  release:
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    environment: production
-    needs: build
-
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: java-app
-          path: build/libs/
-      - name: Upload JAR to EC2
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "build/libs/*.jar"
-          target: "/tmp/"
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            sudo systemctl stop myapp.service
-            sudo cp /tmp/build/libs/*.jar /app/myapp.jar
-            sudo systemctl daemon-reload
-            sudo systemctl start myapp.service

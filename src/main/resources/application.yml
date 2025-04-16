@@ -4,8 +4,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: test@gmail.com
-    password: password
+    username: ${SPRING_MAIL_USERNAME}  # Reads from the environment variable
+    password: ${SPRING_MAIL_PASSWORD}  # Reads from the environment variable
     properties:
       mail:
         smtp:
@@ -14,8 +14,8 @@ spring:
             enable: true
   data:
     mongodb:
-      uri: mongodb+srv://ims:Kzavop5MIa05Bfu0@ims.fawiw.mongodb.net/?maxPoolSize=1&socketTimeoutMS=5000&connectTimeoutMS=5000&retryWrites=true&compressors=zlib
-      database: ims
+      uri: ${SPRING_DATA_MONGODB_URI}  # Reads from the environment variable
+      database: ${SPRING_DATA_MONGODB_DATABASE}  # Reads from the environment variable
 server:
   port: 8080
 logging:

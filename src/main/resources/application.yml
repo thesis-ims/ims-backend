@@ -14,7 +14,7 @@ spring:
             enable: true
   data:
     mongodb:
-      uri: mongodb+srv://ims:Kzavop5MIa05Bfu0@ims.fawiw.mongodb.net
+      uri: mongodb+srv://ims:Kzavop5MIa05Bfu0@ims.fawiw.mongodb.net/?maxPoolSize=1&socketTimeoutMS=5000&connectTimeoutMS=5000&retryWrites=true&compressors=zlib
       database: ims
 server:
   port: 8080

@@ -1,6 +1,5 @@
-package com.backend.ims.data.user.api.model.response;
+package com.backend.ims.general.model.response;
 
-import com.backend.ims.data.user.api.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Data
-public class PaginatedUserResponse {
-  private List<User> users;
+public class PaginatedResponse<T> {
+  private List<T> object;
   private int total;
   private int page;
   private int size;

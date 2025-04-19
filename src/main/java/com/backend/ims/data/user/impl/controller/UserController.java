@@ -1,6 +1,6 @@
 package com.backend.ims.data.user.impl.controller;
 
-import com.backend.ims.data.user.api.model.request.PaginationRequest;
+import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.data.user.api.model.request.UpdateRoleRequest;
 import com.backend.ims.data.user.api.model.request.UserRequest;
 import com.backend.ims.data.user.api.service.UserService;

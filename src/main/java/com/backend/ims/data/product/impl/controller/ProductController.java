@@ -45,5 +45,4 @@ public class ProductController {
   public ResponseEntity<?> insertProduct(@RequestBody Product request) {
     return userService.insertProduct(request);
   }
-
 }

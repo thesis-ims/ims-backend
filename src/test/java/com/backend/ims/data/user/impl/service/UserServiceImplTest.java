@@ -1,10 +1,10 @@
 package com.backend.ims.data.user.impl.service;
 
 import com.backend.ims.data.user.api.model.User;
-import com.backend.ims.data.user.api.model.request.PaginationRequest;
+import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.data.user.api.model.request.UpdateRoleRequest;
 import com.backend.ims.data.user.api.model.request.UserRequest;
-import com.backend.ims.data.user.api.model.response.PaginatedUserResponse;
+import com.backend.ims.general.model.response.PaginatedResponse;
 import com.backend.ims.data.user.api.service.UserService;
 import com.backend.ims.data.user.impl.accessor.UserAccessor;
 import com.backend.ims.general.model.BaseResponse;
@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 @Test
-public class UserServiceTest {
+public class UserServiceImplTest {
 
   @Mock
   private UserAccessor userAccessor;
@@ -59,7 +59,7 @@ public class UserServiceTest {
     ResponseEntity<?> response = userService.getAllUsers(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All User Data");
-    Assert.assertEquals(((BaseResponse<PaginatedUserResponse>) response.getBody()).getData().getUsers().size(), 2);
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 2);
   }
 
   @Test

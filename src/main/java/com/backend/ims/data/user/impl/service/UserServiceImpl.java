@@ -1,10 +1,10 @@
 package com.backend.ims.data.user.impl.service;
 
 import com.backend.ims.data.user.api.model.User;
-import com.backend.ims.data.user.api.model.request.PaginationRequest;
+import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.data.user.api.model.request.UpdateRoleRequest;
 import com.backend.ims.data.user.api.model.request.UserRequest;
-import com.backend.ims.data.user.api.model.response.PaginatedUserResponse;
+import com.backend.ims.general.model.response.PaginatedResponse;
 import com.backend.ims.data.user.api.service.UserService;
 import com.backend.ims.data.user.impl.accessor.UserAccessor;
 import com.backend.ims.data.user.impl.util.UserUtil;
@@ -48,8 +48,8 @@ public class UserServiceImpl implements UserService {
         .peek(UserUtil::hideSensitiveData)
         .toList();
 
-      PaginatedUserResponse response = PaginatedUserResponse.builder()
-        .users(sanitizedUsers)
+      PaginatedResponse<User> response = PaginatedResponse.<User>builder()
+        .object(sanitizedUsers)
         .total(allUsers.size())
         .page(page)
         .size(size)

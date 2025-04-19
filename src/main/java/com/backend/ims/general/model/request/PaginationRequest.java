@@ -1,4 +1,4 @@
-package com.backend.ims.data.user.api.model.request;
+package com.backend.ims.general.model.request;
 
 import lombok.Getter;
 import lombok.Setter;

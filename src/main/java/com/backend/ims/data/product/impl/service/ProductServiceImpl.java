@@ -94,7 +94,7 @@ public class ProductServiceImpl implements ProductService {
         .lut(System.currentTimeMillis())
         .build();
       productAccessor.saveItem(product);
-      return ResponseEntity.ok(new BaseResponse<>("Product Inserted Successfully", request));
+      return ResponseEntity.ok(new BaseResponse<>("Product Inserted Successfully"));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }

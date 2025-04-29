@@ -17,7 +17,13 @@ spring:
       uri: mongodb+srv://ims:Kzavop5MIa05Bfu0@ims.fawiw.mongodb.net/?maxPoolSize=1&socketTimeoutMS=5000&connectTimeoutMS=5000&retryWrites=true&compressors=zlib
       database: ims
 server:
-  port: 8080
+  port: 443
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: imsbackend
+    key-store-type: PKCS12
+    key-alias: ims
 logging:
   level:
     root: INFO

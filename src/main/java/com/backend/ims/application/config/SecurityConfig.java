@@ -36,7 +36,7 @@ public class SecurityConfig {
       .cors(cors -> cors
         .configurationSource(request -> {
           CorsConfiguration config = new CorsConfiguration();
-          config.setAllowedOrigins(List.of("http://localhost:3000", "https://thesis-ims-web.netlify.app/")); // Specific frontend URL
+          config.setAllowedOrigins(List.of("http://localhost:3000", "https://thesis-ims-web.netlify.app")); // Specific frontend URL
           config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
           config.setAllowedHeaders(List.of("*"));
           config.setAllowCredentials(true); // Allow credentials

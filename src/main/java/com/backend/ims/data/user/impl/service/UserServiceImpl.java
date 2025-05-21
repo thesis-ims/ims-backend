@@ -92,6 +92,7 @@ public class UserServiceImpl implements UserService {
       user.setGender(request.getGender());
       user.setPhoneNumber(request.getPhoneNumber());
       user.setDob(request.getDob());
+      user.setImage(request.getImage());
       userAccessor.saveItem(user);
       return ResponseEntity.ok(new BaseResponse<>("Successfully Update User Data"));
     } catch (Exception e) {

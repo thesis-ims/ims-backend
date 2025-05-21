@@ -16,4 +16,5 @@ public class UserRequest {
   private String gender;
   private String phoneNumber;
   private long dob; // Date of birth (timestamp)
+  private byte[] image;
 }

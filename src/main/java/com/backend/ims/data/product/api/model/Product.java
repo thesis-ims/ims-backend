@@ -20,6 +20,7 @@ public class Product {
   @Id
   private String id;
   private String name;
+  private String description;
   private int quantity;
   private long createdDate; // creation time
   private long lut; // last update time

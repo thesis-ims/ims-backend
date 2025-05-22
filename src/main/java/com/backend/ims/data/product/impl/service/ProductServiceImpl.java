@@ -2,6 +2,7 @@ package com.backend.ims.data.product.impl.service;
 
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.data.product.api.model.request.ProductRequest;
+import com.backend.ims.data.product.api.model.response.StockSummary;
 import com.backend.ims.data.product.api.service.ProductService;
 import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.general.model.BaseResponse;
@@ -47,6 +48,17 @@ public class ProductServiceImpl implements ProductService {
       int end = Math.min(start + size, allProducts.size());
 
       List<Product> paginatedProducts = allProducts.subList(start, end);
+      StockSummary stockSummary = new StockSummary();
+
+      allProducts.forEach(product -> {
+        if (product.getQuantity() == 0) {
+          stockSummary.setEmptyStock(stockSummary.getEmptyStock() + 1);
+        } else if (product.getQuantity() < 10) {
+          stockSummary.setLowStock(stockSummary.getLowStock() + 1);
+        } else {
+          stockSummary.setAvailable(stockSummary.getAvailable() + 1);
+        }
+      });
 
       PaginatedResponse<Product> response = PaginatedResponse.<Product>builder()
         .object(paginatedProducts)
@@ -54,6 +66,7 @@ public class ProductServiceImpl implements ProductService {
         .page(page)
         .size(size)
         .totalPages((int) Math.ceil((double) allProducts.size() / size))
+        .otherInfo(stockSummary)
         .build();
 
       return ResponseEntity.ok(new BaseResponse<>("Successfully Getting All Product Data", response));
@@ -87,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
       Product product = Product.builder()
         .id(UUID.randomUUID().toString())
         .name(request.getName())
+        .description(request.getDescription())
         .quantity(request.getQuantity())
         .createdBy(SecurityContextHolder.getContext().getAuthentication().getName())
         .images(request.getImages())
@@ -110,6 +124,10 @@ public class ProductServiceImpl implements ProductService {
       if (product == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>(String.format("Error: There's no product with productId: %s!", request.getId())));
       }
+      product.setName(request.getName());
+      product.setDescription(request.getDescription());
+      product.setQuantity(request.getQuantity());
+      product.setImages(request.getImages());
       product.setLut(System.currentTimeMillis());
       productAccessor.saveItem(product);
       return ResponseEntity.ok(new BaseResponse<>("Successfully Update Product Data"));

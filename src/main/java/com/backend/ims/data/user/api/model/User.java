@@ -36,6 +36,7 @@ public class User implements UserDetails {
   private long createdDate; // Account creation timestamp
   @Builder.Default // In case using builder we need to set up default value
   private boolean enabled = false; // Default false before email confirmation TODO: Confirm if needed or else just hard code it true
+  private byte[] image;
   private List<String> roles;
 
   @Override

@@ -60,10 +60,12 @@ public class ProductServiceImplTest {
     Product product = Product.builder()
       .name("Product 1")
       .createdBy("mockedUser")
+      .quantity(20)
       .build();
     Product product1 = Product.builder()
       .name("Product 2")
       .createdBy("mockedUser")
+      .quantity(0)
       .build();
     Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
     ResponseEntity<?> response = productService.getAllProduct(request);

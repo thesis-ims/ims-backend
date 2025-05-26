@@ -1,14 +1,15 @@
 package com.backend.ims.data.user.impl.service;
 
+import com.backend.ims.data.user.api.common.UserCommon;
 import com.backend.ims.data.user.api.model.User;
-import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.data.user.api.model.request.UpdateRoleRequest;
 import com.backend.ims.data.user.api.model.request.UserRequest;
-import com.backend.ims.general.model.response.PaginatedResponse;
 import com.backend.ims.data.user.api.service.UserService;
 import com.backend.ims.data.user.impl.accessor.UserAccessor;
 import com.backend.ims.data.user.impl.util.UserUtil;
 import com.backend.ims.general.model.BaseResponse;
+import com.backend.ims.general.model.request.PaginationRequest;
+import com.backend.ims.general.model.response.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,6 +90,23 @@ public class UserServiceImpl implements UserService {
       if (user == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>(String.format("Error: There's no user with userId: %s!", request.getUserId())));
       }
+
+      if (userAccessor.isExist(UserCommon.USERNAME, request.getUsername()) &&
+        !user.getUsername().equals(request.getUsername())) {
+        return ResponseEntity
+          .badRequest()
+          .body(new BaseResponse<>(String.format("Error: Username %s is already taken!", request.getUsername())));
+      }
+
+      if (userAccessor.isExist(UserCommon.EMAIL, request.getEmail()) &&
+        !user.getEmail().equals(request.getEmail())) {
+        return ResponseEntity
+          .badRequest()
+          .body(new BaseResponse<>(String.format("Error: Email %s is already in use!", request.getEmail())));
+      }
+
+      user.setEmail(request.getEmail());
+      user.setUsername(request.getUsername());
       user.setGender(request.getGender());
       user.setPhoneNumber(request.getPhoneNumber());
       user.setDob(request.getDob());

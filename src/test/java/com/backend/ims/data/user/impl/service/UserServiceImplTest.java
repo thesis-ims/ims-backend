@@ -1,13 +1,13 @@
 package com.backend.ims.data.user.impl.service;
 
 import com.backend.ims.data.user.api.model.User;
-import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.data.user.api.model.request.UpdateRoleRequest;
 import com.backend.ims.data.user.api.model.request.UserRequest;
-import com.backend.ims.general.model.response.PaginatedResponse;
 import com.backend.ims.data.user.api.service.UserService;
 import com.backend.ims.data.user.impl.accessor.UserAccessor;
 import com.backend.ims.general.model.BaseResponse;
+import com.backend.ims.general.model.request.PaginationRequest;
+import com.backend.ims.general.model.response.PaginatedResponse;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -124,10 +124,45 @@ public class UserServiceImplTest {
   }
 
   @Test
+  public void testUpdateUser_UserExist() {
+    UserRequest request = new UserRequest();
+    request.setUserId("123");
+    request.setUsername("newUser");
+    User existingUser = new User();
+    existingUser.setUsername("existingUser");
+    Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(existingUser);
+    Mockito.when(userAccessor.isExist(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+    ResponseEntity<?> response = userService.updateUser(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: Username newUser is already taken!");
+  }
+
+  @Test
+  public void testUpdateUser_EmailExist() {
+    UserRequest request = new UserRequest();
+    request.setUserId("123");
+    request.setUsername("existingUser");
+    request.setEmail("test@email.com");
+    User existingUser = new User();
+    existingUser.setUsername("existingUser");
+    existingUser.setEmail("test2@email.com");
+    Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(existingUser);
+    Mockito.when(userAccessor.isExist(Mockito.anyString(), Mockito.anyString()))
+      .thenReturn(false)
+      .thenReturn(true);
+    ResponseEntity<?> response = userService.updateUser(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: Email test@email.com is already in use!");
+  }
+
+  @Test
   public void testUpdateUser_Success() {
     UserRequest request = new UserRequest();
     request.setUserId("123");
     Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(new User());
+    Mockito.when(userAccessor.isExist(Mockito.anyString(), Mockito.anyString()))
+      .thenReturn(false)
+      .thenReturn(false);
     ResponseEntity<?> response = userService.updateUser(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Update User Data");

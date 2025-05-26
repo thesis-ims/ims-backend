@@ -13,6 +13,8 @@ import lombok.Setter;
 public class UserRequest {
   @NotNull
   private String userId;
+  private String email;
+  private String username;
   private String gender;
   private String phoneNumber;
   private long dob; // Date of birth (timestamp)

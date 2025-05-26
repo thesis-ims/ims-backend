@@ -2,6 +2,7 @@ package com.backend.ims.data.user.impl.service;
 
 import com.backend.ims.data.user.api.common.UserCommon;
 import com.backend.ims.data.user.api.model.User;
+import com.backend.ims.data.user.api.model.request.ChangePasswordRequest;
 import com.backend.ims.data.user.api.model.request.LoginRequest;
 import com.backend.ims.data.user.api.model.request.RegistrationRequest;
 import com.backend.ims.data.user.api.model.response.AuthResponse;
@@ -94,5 +95,25 @@ public class AuthServiceImpl implements AuthService {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }
+  }
+
+  @Override
+  public ResponseEntity<?> changePassword(ChangePasswordRequest request) {
+    if (request == null || request.getUserId() == null) {
+      return ResponseEntity.badRequest().body(new BaseResponse<>("Error: Request is null!"));
+    }
+    User user = userAccessor.getItemById(request.getUserId());
+    if (user == null) {
+      return ResponseEntity.badRequest().body(new BaseResponse<>(String.format("Error: There's no user with userId: %s!", request.getUserId())));
+    }
+
+    if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+      return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(new BaseResponse<>("Error: Wrong Password!"));
+    }
+    user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    userAccessor.saveItem(user);
+    return ResponseEntity.ok(new BaseResponse<>("Password updated successfully!"));
   }
 }

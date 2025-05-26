@@ -10,13 +10,9 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRequest {
+public class ChangePasswordRequest {
   @NotNull
   private String userId;
-  private String email;
-  private String username;
-  private String gender;
-  private String phoneNumber;
-  private long dob; // Date of birth (timestamp)
-  private byte[] image;
+  private String currentPassword;
+  private String newPassword;
 }

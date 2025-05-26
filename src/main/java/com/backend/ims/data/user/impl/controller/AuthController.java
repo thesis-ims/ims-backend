@@ -1,5 +1,6 @@
 package com.backend.ims.data.user.impl.controller;
 
+import com.backend.ims.data.user.api.model.request.ChangePasswordRequest;
 import com.backend.ims.data.user.api.model.request.LoginRequest;
 import com.backend.ims.data.user.api.model.request.RegistrationRequest;
 import com.backend.ims.data.user.api.service.AuthService;
@@ -29,5 +30,10 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody LoginRequest request) {
     return authService.authenticate(request);
+  }
+
+  @PostMapping("/change-password")
+  public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    return authService.changePassword(request);
   }
 }

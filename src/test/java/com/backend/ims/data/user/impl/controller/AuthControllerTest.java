@@ -1,5 +1,6 @@
 package com.backend.ims.data.user.impl.controller;
 
+import com.backend.ims.data.user.api.model.request.ChangePasswordRequest;
 import com.backend.ims.data.user.api.model.request.LoginRequest;
 import com.backend.ims.data.user.api.model.request.RegistrationRequest;
 import com.backend.ims.data.user.api.service.AuthService;
@@ -47,6 +48,13 @@ public class AuthControllerTest {
 
     Mockito.when(authService.register(Mockito.any())).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
     ResponseEntity<?> actualResponse = authController.register(request);
+    Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
+  }
+
+  @Test
+  public void testChangePassword() {
+    Mockito.when(authService.changePassword(Mockito.any())).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
+    ResponseEntity<?> actualResponse = authController.changePassword(new ChangePasswordRequest());
     Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
   }
 }

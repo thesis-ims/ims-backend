@@ -2,6 +2,7 @@ package com.backend.ims.data.user.impl.service;
 
 import com.backend.ims.data.user.api.common.UserCommon;
 import com.backend.ims.data.user.api.model.User;
+import com.backend.ims.data.user.api.model.request.ChangePasswordRequest;
 import com.backend.ims.data.user.api.model.request.LoginRequest;
 import com.backend.ims.data.user.api.model.request.RegistrationRequest;
 import com.backend.ims.data.user.api.model.response.AuthResponse;
@@ -172,5 +173,59 @@ public class AuthServiceImplTest {
     Mockito.when(userAccessor.getByFilter(Mockito.any(), Mockito.any())).thenThrow(RuntimeException.class);
     ResponseEntity<?> response = authService.authenticate(new LoginRequest());
     Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testChangePassword_UserNull() {
+    ChangePasswordRequest request = new ChangePasswordRequest();
+    request.setUserId("user");
+    request.setCurrentPassword("currentPassword");
+    request.setNewPassword("newPassword");
+
+    Mockito.when(userAccessor.getByFilter(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
+    ResponseEntity<?> response = authService.changePassword(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: There's no user with userId: user!");
+  }
+
+  @Test
+  public void testChangePassword_InvalidPassword() {
+    User user = User.builder()
+      .username("validUser")
+      .password("encodedPassword")
+      .enabled(true)
+      .build();
+
+    ChangePasswordRequest request = new ChangePasswordRequest();
+    request.setUserId("user");
+    request.setCurrentPassword("currentPassword");
+    request.setNewPassword("newPassword");
+
+    Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(user);
+    Mockito.when(passwordEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+    ResponseEntity<?> response = authService.changePassword(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: Wrong Password!");
+  }
+
+
+  @Test
+  public void testChangePassword_Success() {
+    User user = User.builder()
+      .username("validUser")
+      .password("encodedPassword")
+      .enabled(true)
+      .build();
+
+    ChangePasswordRequest request = new ChangePasswordRequest();
+    request.setUserId("user");
+    request.setCurrentPassword("currentPassword");
+    request.setNewPassword("newPassword");
+
+    Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(user);
+    Mockito.when(passwordEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+    ResponseEntity<?> response = authService.changePassword(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Password updated successfully!");
   }
 }

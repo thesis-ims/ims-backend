@@ -5,6 +5,7 @@ import com.backend.ims.data.product.api.model.request.ProductRequest;
 import com.backend.ims.data.product.api.model.response.StockSummary;
 import com.backend.ims.data.product.api.service.ProductService;
 import com.backend.ims.data.product.impl.accessor.ProductAccessor;
+import com.backend.ims.data.product.impl.util.ProductUtil;
 import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.general.model.response.PaginatedResponse;
@@ -42,15 +43,17 @@ public class ProductServiceImpl implements ProductService {
         .filter(product -> authenticatedUserId.equals(product.getCreatedBy()))
         .toList();
 
+      List<Product> filteredProducts = ProductUtil.filterProducts(allProducts, request.getFilter());
+
       int size = request.getSize();
       int page = request.getPage();
       int start = Math.max(0, (page - 1) * size);
-      int end = Math.min(start + size, allProducts.size());
+      int end = Math.min(start + size, filteredProducts.size());
 
-      List<Product> paginatedProducts = allProducts.subList(start, end);
+      List<Product> paginatedProducts = filteredProducts.subList(start, end);
       StockSummary stockSummary = new StockSummary();
 
-      allProducts.forEach(product -> {
+      filteredProducts.forEach(product -> {
         if (product.getQuantity() == 0) {
           stockSummary.setEmptyStock(stockSummary.getEmptyStock() + 1);
         } else if (product.getQuantity() < 10) {
@@ -62,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
       PaginatedResponse<Product> response = PaginatedResponse.<Product>builder()
         .object(paginatedProducts)
-        .total(allProducts.size())
+        .total(filteredProducts.size())
         .page(page)
         .size(size)
         .totalPages((int) Math.ceil((double) allProducts.size() / size))

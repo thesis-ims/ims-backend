@@ -6,6 +6,7 @@ import com.backend.ims.data.product.api.service.ProductService;
 import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.model.request.PaginationRequest;
+import com.backend.ims.general.model.request.SpecFilter;
 import com.backend.ims.general.model.response.PaginatedResponse;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -66,6 +67,148 @@ public class ProductServiceImplTest {
       .name("Product 2")
       .createdBy("mockedUser")
       .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 2);
+  }
+
+  @Test
+  public void testGetAllProduct_FilterDescending() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.NAME_DESCENDING);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 2);
+  }
+
+  @Test
+  public void testGetAllProduct_FilterAscending() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.NAME_ASCENDING);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 2);
+  }
+
+  @Test
+  public void testGetAllProduct_LowestStock() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.LOWEST_STOCK);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 2);
+  }
+
+  @Test
+  public void testGetAllProduct_Highest_Stock() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.HIGHEST_STOCK);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 2);
+  }
+
+  @Test
+  public void testGetAllProduct_Oldest() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.OLDEST);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .createdDate(1)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .createdDate(2)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 2);
+  }
+
+  @Test
+  public void testGetAllProduct_Newest() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.NEWEST);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .createdDate(1)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .createdDate(2)
       .build();
     Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
     ResponseEntity<?> response = productService.getAllProduct(request);

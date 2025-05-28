@@ -8,4 +8,5 @@ import lombok.Setter;
 public class PaginationRequest {
   private int page;
   private int size;
+  private SpecFilter filter;
 }

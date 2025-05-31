@@ -21,6 +21,9 @@ public class Product {
   private String id;
   private String name;
   private String description;
+  private String category;
+  private long buyPrice;
+  private long sellPrice;
   private int quantity;
   private long createdDate; // creation time
   private long lut; // last update time

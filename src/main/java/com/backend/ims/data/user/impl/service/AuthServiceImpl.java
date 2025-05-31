@@ -26,17 +26,17 @@ public class AuthServiceImpl implements AuthService {
   private final UserAccessor userAccessor;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
-
-  @Autowired
-  private ActivityLogService activityLogService;
+  private final ActivityLogService activityLogService;
 
   @Autowired
   public AuthServiceImpl(UserAccessor userAccessor,
                          PasswordEncoder passwordEncoder,
-                         JwtUtil jwtUtil) {
+                         JwtUtil jwtUtil,
+                         ActivityLogService activityLogService) {
     this.userAccessor = userAccessor;
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
+    this.activityLogService = activityLogService;
   }
 
   @Override

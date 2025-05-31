@@ -1,5 +1,6 @@
 package com.backend.ims.data.user.impl.service;
 
+import com.backend.ims.data.activitylog.api.service.ActivityLogService;
 import com.backend.ims.data.user.api.common.UserCommon;
 import com.backend.ims.data.user.api.model.User;
 import com.backend.ims.data.user.api.model.request.ChangePasswordRequest;
@@ -22,6 +23,8 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+
 @Test
 public class AuthServiceImplTest {
 
@@ -34,12 +37,15 @@ public class AuthServiceImplTest {
   @Mock
   private JwtUtil jwtUtil;
 
+  @Mock
+  private ActivityLogService activityLogService;
+
   private AuthService authService;
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    authService = new AuthServiceImpl(userAccessor, passwordEncoder, jwtUtil);
+    authService = new AuthServiceImpl(userAccessor, passwordEncoder, jwtUtil, activityLogService);
   }
 
   @Test
@@ -166,6 +172,7 @@ public class AuthServiceImplTest {
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse<AuthResponse>) response.getBody()).getData().getToken(), "jwtToken");
     Mockito.verify(jwtUtil).generateToken(Mockito.eq("validUser"), Mockito.eq(List.of("ROLE_USER")));
+    Mockito.verify(activityLogService).logActivity(anyString(), anyString());
   }
 
   @Test

@@ -1,5 +1,6 @@
 package com.backend.ims.data.product.impl.service;
 
+import com.backend.ims.data.activitylog.api.service.ActivityLogService;
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.data.product.api.model.request.ProductRequest;
 import com.backend.ims.data.product.api.service.ProductService;
@@ -11,7 +12,6 @@ import com.backend.ims.general.model.response.PaginatedResponse;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,21 +23,22 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+
 @Test
 public class ProductServiceImplTest {
 
   @Mock
   private ProductAccessor productAccessor;
-
   @Mock
-  private MongoTemplate mongoTemplate;
+  private ActivityLogService activityLogService;
 
   private ProductService productService;
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    productService = new ProductServiceImpl(productAccessor);
+    productService = new ProductServiceImpl(productAccessor, activityLogService);
     SecurityContext securityContext = Mockito.mock(SecurityContext.class);
     Authentication authentication = Mockito.mock(Authentication.class);
 
@@ -235,7 +236,7 @@ public class ProductServiceImplTest {
   public void testGetProductDetail_ProductNull() {
     ProductRequest request = new ProductRequest();
     request.setProductId("123");
-    Mockito.when(productAccessor.getItemById(Mockito.anyString())).thenReturn(null);
+    Mockito.when(productAccessor.getItemById(anyString())).thenReturn(null);
     ResponseEntity<?> response = productService.getProductDetail(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: There's no product with productId: 123!");
@@ -245,7 +246,7 @@ public class ProductServiceImplTest {
   public void testGetProductDetail_Success() {
     ProductRequest request = new ProductRequest();
     request.setProductId("123");
-    Mockito.when(productAccessor.getItemById(Mockito.anyString())).thenReturn(new Product());
+    Mockito.when(productAccessor.getItemById(anyString())).thenReturn(new Product());
     ResponseEntity<?> response = productService.getProductDetail(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting Product Data");
@@ -256,7 +257,7 @@ public class ProductServiceImplTest {
   public void testGetProductDetail_Exception() {
     ProductRequest request = new ProductRequest();
     request.setProductId("123");
-    Mockito.when(productAccessor.getItemById(Mockito.anyString())).thenThrow(RuntimeException.class);
+    Mockito.when(productAccessor.getItemById(anyString())).thenThrow(RuntimeException.class);
     ResponseEntity<?> response = productService.getProductDetail(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
@@ -276,6 +277,7 @@ public class ProductServiceImplTest {
     ResponseEntity<?> response = productService.insertProduct(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Product Inserted Successfully");
+    Mockito.verify(activityLogService).logActivity(anyString(), anyString());
   }
 
 
@@ -300,7 +302,7 @@ public class ProductServiceImplTest {
   public void testUpdateProduct_ProductNull() {
     Product request = new Product();
     request.setId("123");
-    Mockito.when(productAccessor.getItemById(Mockito.anyString())).thenReturn(null);
+    Mockito.when(productAccessor.getItemById(anyString())).thenReturn(null);
     ResponseEntity<?> response = productService.updateProduct(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Error: There's no product with productId: 123!");
@@ -310,17 +312,26 @@ public class ProductServiceImplTest {
   public void testUpdateProduct_Success() {
     Product request = new Product();
     request.setId("123");
-    Mockito.when(productAccessor.getItemById(Mockito.anyString())).thenReturn(new Product());
+    request.setName("Updated Product");
+
+    Product existingProduct = Product.builder()
+      .id("123")
+      .name("Old Product")
+      .build();
+
+    Mockito.when(productAccessor.getItemById(anyString())).thenReturn(existingProduct);
     ResponseEntity<?> response = productService.updateProduct(request);
+
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Update Product Data");
+    Mockito.verify(activityLogService).logActivity(anyString(), anyString());
   }
 
   @Test
   public void testUpdateProduct_Exception() {
     Product request = new Product();
     request.setId("123");
-    Mockito.when(productAccessor.getItemById(Mockito.anyString())).thenThrow(RuntimeException.class);
+    Mockito.when(productAccessor.getItemById(anyString())).thenThrow(RuntimeException.class);
     ResponseEntity<?> response = productService.updateProduct(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }

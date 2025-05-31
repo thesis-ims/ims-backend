@@ -25,13 +25,13 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
   private final ProductAccessor productAccessor;
+  private final ActivityLogService activityLogService;
 
   @Autowired
-  private ActivityLogService activityLogService;
-
-  @Autowired
-  public ProductServiceImpl(ProductAccessor productAccessor) {
+  public ProductServiceImpl(ProductAccessor productAccessor,
+                            ActivityLogService activityLogService) {
     this.productAccessor = productAccessor;
+    this.activityLogService = activityLogService;
   }
 
   @Override

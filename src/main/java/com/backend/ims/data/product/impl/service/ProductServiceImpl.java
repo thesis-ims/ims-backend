@@ -110,6 +110,9 @@ public class ProductServiceImpl implements ProductService {
         .id(UUID.randomUUID().toString())
         .name(request.getName())
         .description(request.getDescription())
+        .category(request.getCategory())
+        .buyPrice(request.getBuyPrice())
+        .sellPrice(request.getSellPrice())
         .quantity(request.getQuantity())
         .createdBy(SecurityContextHolder.getContext().getAuthentication().getName())
         .images(request.getImages())
@@ -143,6 +146,9 @@ public class ProductServiceImpl implements ProductService {
 
       product.setName(request.getName());
       product.setDescription(request.getDescription());
+      product.setCategory(request.getCategory());
+      product.setBuyPrice(request.getBuyPrice());
+      product.setSellPrice(request.getSellPrice());
       product.setQuantity(request.getQuantity());
       product.setImages(request.getImages());
       product.setLut(System.currentTimeMillis());

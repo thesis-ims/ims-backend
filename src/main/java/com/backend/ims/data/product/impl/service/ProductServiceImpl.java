@@ -1,5 +1,6 @@
 package com.backend.ims.data.product.impl.service;
 
+import com.backend.ims.data.activitylog.api.service.ActivityLogService;
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.data.product.api.model.request.ProductRequest;
 import com.backend.ims.data.product.api.model.response.StockSummary;
@@ -9,6 +10,8 @@ import com.backend.ims.data.product.impl.util.ProductUtil;
 import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.general.model.response.PaginatedResponse;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,9 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
   private final ProductAccessor productAccessor;
+
+  @Autowired
+  private ActivityLogService activityLogService;
 
   @Autowired
   public ProductServiceImpl(ProductAccessor productAccessor) {
@@ -111,6 +117,10 @@ public class ProductServiceImpl implements ProductService {
         .lut(System.currentTimeMillis())
         .build();
       productAccessor.saveItem(product);
+
+      // Log changes
+      String username = SecurityContextHolder.getContext().getAuthentication().getName();
+      activityLogService.logActivity(username, "Product inserted: " + request.getName());
       return ResponseEntity.ok(new BaseResponse<>("Product Inserted Successfully"));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
@@ -127,12 +137,20 @@ public class ProductServiceImpl implements ProductService {
       if (product == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>(String.format("Error: There's no product with productId: %s!", request.getId())));
       }
+      // Compare original and updated product using Javers
+      Javers javers = JaversBuilder.javers().build();
+      String changes = javers.compare(product, request).prettyPrint();
+
       product.setName(request.getName());
       product.setDescription(request.getDescription());
       product.setQuantity(request.getQuantity());
       product.setImages(request.getImages());
       product.setLut(System.currentTimeMillis());
       productAccessor.saveItem(product);
+
+      // Log changes
+      String username = SecurityContextHolder.getContext().getAuthentication().getName();
+      activityLogService.logActivity(username, "Product updated: " + changes);
       return ResponseEntity.ok(new BaseResponse<>("Successfully Update Product Data"));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));

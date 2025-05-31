@@ -1,5 +1,6 @@
 package com.backend.ims.data.user.impl.service;
 
+import com.backend.ims.data.activitylog.api.service.ActivityLogService;
 import com.backend.ims.data.user.api.common.UserCommon;
 import com.backend.ims.data.user.api.model.User;
 import com.backend.ims.data.user.api.model.request.ChangePasswordRequest;
@@ -25,6 +26,9 @@ public class AuthServiceImpl implements AuthService {
   private final UserAccessor userAccessor;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
+
+  @Autowired
+  private ActivityLogService activityLogService;
 
   @Autowired
   public AuthServiceImpl(UserAccessor userAccessor,
@@ -91,6 +95,7 @@ public class AuthServiceImpl implements AuthService {
       }
 
       String token = jwtUtil.generateToken(user.getUsername(), user.getRoles());
+      activityLogService.logActivity(user.getUsername(), "User Logged In");
       return ResponseEntity.ok(new BaseResponse<>(new AuthResponse(user.getId(), token)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));

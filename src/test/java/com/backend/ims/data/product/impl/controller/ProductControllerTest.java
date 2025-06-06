@@ -63,4 +63,25 @@ public class ProductControllerTest {
     ResponseEntity<?> actualResponse = productController.deleteProduct(new ProductRequest());
     Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
   }
+
+  @Test
+  public void testGetStockSummary() {
+    Mockito.when(productService.getStockSummary()).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
+    ResponseEntity<?> actualResponse = productController.getStockSummary();
+    Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
+  }
+
+  @Test
+  public void testGetCategorySummary() {
+    Mockito.when(productService.getCategorySummary()).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
+    ResponseEntity<?> actualResponse = productController.getCategorySummary();
+    Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
+  }
+
+  @Test
+  public void testGetNameSummary() {
+    Mockito.when(productService.getNameSummary()).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
+    ResponseEntity<?> actualResponse = productController.getNameSummary();
+    Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
+  }
 }

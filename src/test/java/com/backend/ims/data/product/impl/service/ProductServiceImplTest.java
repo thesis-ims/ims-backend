@@ -361,10 +361,20 @@ public class ProductServiceImplTest {
     Product request = new Product();
     request.setId("123");
     request.setName("Updated Product");
+    request.setCategory("Electronics");
+    request.setQuantity(50);
+    request.setSellPrice(99);
+    request.setBuyPrice(79);
+    request.setDescription("Updated description");
 
     Product existingProduct = Product.builder()
       .id("123")
       .name("Old Product")
+      .category("Old Category")
+      .quantity(10)
+      .sellPrice(50)
+      .buyPrice(30)
+      .description("Old description")
       .build();
 
     Mockito.when(productAccessor.getItemById(anyString())).thenReturn(existingProduct);

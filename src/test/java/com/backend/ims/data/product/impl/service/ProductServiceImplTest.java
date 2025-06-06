@@ -9,6 +9,7 @@ import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.general.model.request.SpecFilter;
+import com.backend.ims.general.model.response.MapResponse;
 import com.backend.ims.general.model.response.PaginatedResponse;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -445,7 +446,7 @@ public class ProductServiceImplTest {
     ResponseEntity<?> response = productService.getCategorySummary();
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting Category Summary Data");
-    Assert.assertEquals(((BaseResponse<Map<String, Integer>>) response.getBody()).getData().size(), 2);
+    Assert.assertEquals(((BaseResponse<List<MapResponse>>) response.getBody()).getData().size(), 2);
   }
 
   @Test
@@ -473,7 +474,7 @@ public class ProductServiceImplTest {
     ResponseEntity<?> response = productService.getNameSummary();
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting Name Summary Data");
-    Assert.assertEquals(((BaseResponse<Map<String, Integer>>) response.getBody()).getData().size(), 2);
+    Assert.assertEquals(((BaseResponse<List<MapResponse>>) response.getBody()).getData().size(), 2);
   }
 
   @Test

@@ -47,4 +47,25 @@ public interface ProductService {
    * @return base response
    */
   ResponseEntity<?> deleteProduct(ProductRequest request);
+
+  /**
+   * This method will get stock summary of all products
+   *
+   * @return stock summary of all products
+   */
+  ResponseEntity<?> getStockSummary();
+
+  /**
+   * This method will get all category summary
+   *
+   * @return category summary of all products
+   */
+  ResponseEntity<?> getCategorySummary();
+
+  /**
+   * This method will get all name summary
+   *
+   * @return name summary of all products
+   */
+  ResponseEntity<?> getNameSummary();
 }

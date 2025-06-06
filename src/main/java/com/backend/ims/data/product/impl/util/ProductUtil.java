@@ -36,6 +36,12 @@ public class ProductUtil {
       case NEWEST:
         mutableProducts.sort(Comparator.comparingLong(Product::getCreatedDate).reversed());
         break;
+      case LOW_STOCK:
+        mutableProducts.removeIf(product -> product.getQuantity() == 0 || product.getQuantity() >= 10);
+        break;
+      case OUT_OF_STOCK:
+        mutableProducts.removeIf(product -> product.getQuantity() > 0);
+        break;
       default:
         break;
     }

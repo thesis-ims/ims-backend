@@ -3,6 +3,7 @@ package com.backend.ims.data.product.impl.service;
 import com.backend.ims.data.activitylog.api.service.ActivityLogService;
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.data.product.api.model.request.ProductRequest;
+import com.backend.ims.data.product.api.model.response.StockSummary;
 import com.backend.ims.data.product.api.service.ProductService;
 import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.general.model.BaseResponse;
@@ -22,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
@@ -219,6 +221,52 @@ public class ProductServiceImplTest {
   }
 
   @Test
+  public void testGetAllProduct_Low_Stock() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.LOW_STOCK);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 0);
+  }
+
+  @Test
+  public void testGetAllProduct_Out_Of_Stock() {
+    PaginationRequest request = new PaginationRequest();
+    request.setPage(1);
+    request.setSize(10);
+    request.setFilter(SpecFilter.OUT_OF_STOCK);
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getAllProduct(request);
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting All Product Data");
+    Assert.assertEquals(((BaseResponse<PaginatedResponse>) response.getBody()).getData().getObject().size(), 1);
+  }
+
+  @Test
   public void testGetAllProduct_Exception() {
     Mockito.when(productAccessor.getAllItems()).thenThrow(RuntimeException.class);
     ResponseEntity<?> response = productService.getAllProduct(new PaginationRequest());
@@ -350,5 +398,88 @@ public class ProductServiceImplTest {
     ResponseEntity<?> response = productService.deleteProduct(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Delete Product Data");
+  }
+
+  @Test
+  public void testGetStockSummary_Success() {
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getStockSummary();
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting Stock Summary Data");
+    Assert.assertEquals(((BaseResponse<StockSummary>) response.getBody()).getData().getEmptyStock(), 1);
+    Assert.assertEquals(((BaseResponse<StockSummary>) response.getBody()).getData().getAvailable(), 1);
+  }
+
+  @Test
+  public void testGetStockSummary_Exception() {
+    Mockito.when(productAccessor.getAllItems()).thenThrow(RuntimeException.class);
+    ResponseEntity<?> response = productService.getStockSummary();
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testGetCategorySummary_Success() {
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .category("Electronics")
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .category("Furniture")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getCategorySummary();
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting Category Summary Data");
+    Assert.assertEquals(((BaseResponse<Map<String, Integer>>) response.getBody()).getData().size(), 2);
+  }
+
+  @Test
+  public void testGetCategorySummary_Exception() {
+    Mockito.when(productAccessor.getAllItems()).thenThrow(RuntimeException.class);
+    ResponseEntity<?> response = productService.getCategorySummary();
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testGetNameSummary_Success() {
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .category("Electronics")
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .category("Furniture")
+      .quantity(0)
+      .build();
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.getNameSummary();
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Getting Name Summary Data");
+    Assert.assertEquals(((BaseResponse<Map<String, Integer>>) response.getBody()).getData().size(), 2);
+  }
+
+  @Test
+  public void testGetNameSummary_Exception() {
+    Mockito.when(productAccessor.getAllItems()).thenThrow(RuntimeException.class);
+    ResponseEntity<?> response = productService.getNameSummary();
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

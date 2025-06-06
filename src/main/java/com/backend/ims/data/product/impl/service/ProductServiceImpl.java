@@ -11,8 +11,6 @@ import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.general.model.response.MapResponse;
 import com.backend.ims.general.model.response.PaginatedResponse;
-import org.javers.core.Javers;
-import org.javers.core.JaversBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -131,9 +129,32 @@ public class ProductServiceImpl implements ProductService {
       if (product == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>(String.format("Error: There's no product with productId: %s!", request.getId())));
       }
-      // Compare original and updated product using Javers
-      Javers javers = JaversBuilder.javers().build();
-      String changes = javers.compare(product, request).prettyPrint();
+      // Compare original and updated product
+      StringBuilder changes = new StringBuilder();
+      if (!product.getName().equals(request.getName())) {
+        changes.append("Name changed from '").append(product.getName())
+          .append("' to '").append(request.getName()).append("'. ");
+      }
+      if (!product.getDescription().equals(request.getDescription())) {
+        changes.append("Description changed from '").append(product.getDescription())
+          .append("' to '").append(request.getDescription()).append("'. ");
+      }
+      if (!product.getCategory().equals(request.getCategory())) {
+        changes.append("Category changed from '").append(product.getCategory())
+          .append("' to '").append(request.getCategory()).append("'. ");
+      }
+      if (product.getBuyPrice() != request.getBuyPrice()) {
+        changes.append("Buy price changed from ").append(product.getBuyPrice())
+          .append(" to ").append(request.getBuyPrice()).append(". ");
+      }
+      if (product.getSellPrice() != request.getSellPrice()) {
+        changes.append("Sell price changed from ").append(product.getSellPrice())
+          .append(" to ").append(request.getSellPrice()).append(". ");
+      }
+      if (product.getQuantity() != request.getQuantity()) {
+        changes.append("Quantity changed from ").append(product.getQuantity())
+          .append(" to ").append(request.getQuantity()).append(". ");
+      }
 
       product.setName(request.getName());
       product.setDescription(request.getDescription());

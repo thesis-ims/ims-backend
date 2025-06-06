@@ -9,6 +9,7 @@ import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.data.product.impl.util.ProductUtil;
 import com.backend.ims.general.model.BaseResponse;
 import com.backend.ims.general.model.request.PaginationRequest;
+import com.backend.ims.general.model.response.MapResponse;
 import com.backend.ims.general.model.response.PaginatedResponse;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -215,7 +216,11 @@ public class ProductServiceImpl implements ProductService {
         }
       });
 
-      return ResponseEntity.ok(new BaseResponse<>("Successfully Getting Category Summary Data", categorySummary));
+      List<MapResponse> mapResponses = categorySummary.entrySet().stream()
+        .map(entry -> new MapResponse(entry.getKey(), entry.getValue()))
+        .toList();
+
+      return ResponseEntity.ok(new BaseResponse<>("Successfully Getting Category Summary Data", mapResponses));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }
@@ -241,7 +246,11 @@ public class ProductServiceImpl implements ProductService {
         }
       });
 
-      return ResponseEntity.ok(new BaseResponse<>("Successfully Getting Name Summary Data", nameSummary));
+      List<MapResponse> mapResponses = nameSummary.entrySet().stream()
+        .map(entry -> new MapResponse(entry.getKey(), entry.getValue()))
+        .toList();
+
+      return ResponseEntity.ok(new BaseResponse<>("Successfully Getting Name Summary Data", mapResponses));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }

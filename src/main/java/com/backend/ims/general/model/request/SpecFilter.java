@@ -6,5 +6,7 @@ public enum SpecFilter {
   NAME_ASCENDING,
   NAME_DESCENDING,
   OLDEST,
-  NEWEST
+  NEWEST,
+  LOW_STOCK,
+  OUT_OF_STOCK
 }

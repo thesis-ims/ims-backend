@@ -45,4 +45,19 @@ public class ProductController {
   public ResponseEntity<?> insertProduct(@RequestBody Product request) {
     return userService.insertProduct(request);
   }
+
+  @PostMapping("/get-stock-summary")
+  public ResponseEntity<?> getStockSummary() {
+    return userService.getStockSummary();
+  }
+
+  @PostMapping("/get-category-summary")
+  public ResponseEntity<?> getCategorySummary() {
+    return userService.getCategorySummary();
+  }
+
+  @PostMapping("/get-name-summary")
+  public ResponseEntity<?> getNameSummary() {
+    return userService.getNameSummary();
+  }
 }

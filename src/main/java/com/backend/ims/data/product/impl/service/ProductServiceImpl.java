@@ -18,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -57,17 +59,6 @@ public class ProductServiceImpl implements ProductService {
       int end = Math.min(start + size, filteredProducts.size());
 
       List<Product> paginatedProducts = filteredProducts.subList(start, end);
-      StockSummary stockSummary = new StockSummary();
-
-      filteredProducts.forEach(product -> {
-        if (product.getQuantity() == 0) {
-          stockSummary.setEmptyStock(stockSummary.getEmptyStock() + 1);
-        } else if (product.getQuantity() < 10) {
-          stockSummary.setLowStock(stockSummary.getLowStock() + 1);
-        } else {
-          stockSummary.setAvailable(stockSummary.getAvailable() + 1);
-        }
-      });
 
       PaginatedResponse<Product> response = PaginatedResponse.<Product>builder()
         .object(paginatedProducts)
@@ -75,7 +66,6 @@ public class ProductServiceImpl implements ProductService {
         .page(page)
         .size(size)
         .totalPages((int) Math.ceil((double) allProducts.size() / size))
-        .otherInfo(stockSummary)
         .build();
 
       return ResponseEntity.ok(new BaseResponse<>("Successfully Getting All Product Data", response));
@@ -171,6 +161,87 @@ public class ProductServiceImpl implements ProductService {
       }
       productAccessor.deleteItem(request.getProductId());
       return ResponseEntity.ok(new BaseResponse<>("Successfully Delete Product Data"));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
+    }
+  }
+
+  @Override
+  public ResponseEntity<?> getStockSummary() {
+    try {
+      // Get the authenticated user's ID
+      String authenticatedUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+      // Fetch all products created by the authenticated user
+      List<Product> allProducts = productAccessor.getAllItems().stream()
+        .filter(product -> authenticatedUserId.equals(product.getCreatedBy()))
+        .toList();
+
+      StockSummary stockSummary = new StockSummary();
+
+      allProducts.forEach(product -> {
+        if (product.getQuantity() == 0) {
+          stockSummary.setEmptyStock(stockSummary.getEmptyStock() + 1);
+        } else if (product.getQuantity() < 10) {
+          stockSummary.setLowStock(stockSummary.getLowStock() + 1);
+        } else {
+          stockSummary.setAvailable(stockSummary.getAvailable() + 1);
+        }
+      });
+
+      return ResponseEntity.ok(new BaseResponse<>("Successfully Getting Stock Summary Data", stockSummary));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
+    }
+  }
+
+  @Override
+  public ResponseEntity<?> getCategorySummary() {
+    try {
+      // Get the authenticated user's ID
+      String authenticatedUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+      // Fetch all products created by the authenticated user
+      List<Product> allProducts = productAccessor.getAllItems().stream()
+        .filter(product -> authenticatedUserId.equals(product.getCreatedBy()))
+        .toList();
+
+      Map<String, Integer> categorySummary = new HashMap<>();
+
+      allProducts.forEach(product -> {
+        String category = product.getCategory();
+        if (category != null && !category.isEmpty()) {
+          categorySummary.put(category, categorySummary.getOrDefault(category, 0) + 1);
+        }
+      });
+
+      return ResponseEntity.ok(new BaseResponse<>("Successfully Getting Category Summary Data", categorySummary));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
+    }
+  }
+
+  @Override
+  public ResponseEntity<?> getNameSummary() {
+    try {
+      // Get the authenticated user's ID
+      String authenticatedUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+      // Fetch all products created by the authenticated user
+      List<Product> allProducts = productAccessor.getAllItems().stream()
+        .filter(product -> authenticatedUserId.equals(product.getCreatedBy()))
+        .toList();
+
+      Map<String, Integer> nameSummary = new HashMap<>();
+
+      allProducts.forEach(product -> {
+        String name = product.getName();
+        if (name != null && !name.isEmpty()) {
+          nameSummary.put(name, nameSummary.getOrDefault(name, 0) + 1);
+        }
+      });
+
+      return ResponseEntity.ok(new BaseResponse<>("Successfully Getting Name Summary Data", nameSummary));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }

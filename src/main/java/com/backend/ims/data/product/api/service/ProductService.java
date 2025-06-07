@@ -77,4 +77,11 @@ public interface ProductService {
    * @return name summary of all products
    */
   ResponseEntity<?> getNameSummary();
+
+  /**
+   * This method will export all product data to csv file
+   *
+   * @return csv file response
+   */
+  ResponseEntity<?> exportCsv();
 }

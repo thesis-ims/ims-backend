@@ -3,7 +3,9 @@ package com.backend.ims.data.product.impl.util;
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.general.model.request.SpecFilter;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVFormat.Builder;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.BufferedReader;
@@ -80,5 +82,24 @@ public class ProductUtil {
       }
     }
     return products;
+  }
+
+  public static StringBuilder parseProductsToCsv(List<Product> allProducts) throws IOException {
+    StringBuilder csvData = new StringBuilder();
+    try (CSVPrinter printer = new CSVPrinter(csvData, CSVFormat.Builder.create()
+      .setHeader("Name", "Description", "Category", "Buy Price", "Sell Price", "Quantity")
+      .build())) {
+      for (Product product : allProducts) {
+        printer.printRecord(
+          product.getName(),
+          product.getDescription(),
+          product.getCategory(),
+          product.getBuyPrice(),
+          product.getSellPrice(),
+          product.getQuantity()
+        );
+      }
+    }
+    return csvData;
   }
 }

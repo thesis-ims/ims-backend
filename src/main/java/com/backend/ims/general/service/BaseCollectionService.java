@@ -32,10 +32,6 @@ public abstract class BaseCollectionService<T> {
     getMongoTemplate().remove(query, getCollectionName());
   }
 
-  public void deleteAllUsers() {
-    getMongoTemplate().remove(new Query(), getCollectionName());
-  }
-
   public T getByFilter(String key, String value) {
     Query query = new Query(Criteria.where(key).is(value));
 
@@ -45,6 +41,15 @@ public abstract class BaseCollectionService<T> {
   public boolean isExist(String key, String value) {
     Query query = new Query(Criteria.where(key).is(value));
     return getMongoTemplate().exists(query, getEntityClass());
+  }
+
+  public void deleteAll(String username) {
+    Query query = new Query(Criteria.where("createdBy").is(username));
+    getMongoTemplate().remove(query, getEntityClass(), getCollectionName());
+  }
+
+  public void insertAll(List<T> items) {
+    getMongoTemplate().insert(items, getCollectionName());
   }
 
   protected abstract Class<T> getEntityClass();

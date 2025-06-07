@@ -8,6 +8,8 @@ import com.backend.ims.data.product.api.service.ProductService;
 import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.data.product.impl.util.ProductUtil;
 import com.backend.ims.general.model.BaseResponse;
+import com.backend.ims.general.model.request.ImportCsvRequest;
+import com.backend.ims.general.model.request.ImportType;
 import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.general.model.response.MapResponse;
 import com.backend.ims.general.model.response.PaginatedResponse;
@@ -90,11 +92,28 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
+  public ResponseEntity<?> importCsv(ImportCsvRequest request) {
+    try {
+      String username = SecurityContextHolder.getContext().getAuthentication().getName();
+      List<Product> products = ProductUtil.parseCsvToProducts(request.getCsvData(), username);
+      if (request.getImportType() == ImportType.REPLACE) {
+        productAccessor.deleteAll(username); // Delete all products created by the user before importing
+      }
+      productAccessor.insertAll(products); // Insert all products from the CSV
+      return ResponseEntity.ok(new BaseResponse<>("Successfully Import Product Data by " + request.getImportType().name()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
+    }
+  }
+
+  @Override
   public ResponseEntity<?> insertProduct(Product request) {
     try {
       if (request == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>("Error: Request is null!"));
       }
+      String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
       Product product = Product.builder()
         .id(UUID.randomUUID().toString())
         .name(request.getName())
@@ -103,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
         .buyPrice(request.getBuyPrice())
         .sellPrice(request.getSellPrice())
         .quantity(request.getQuantity())
-        .createdBy(SecurityContextHolder.getContext().getAuthentication().getName())
+        .createdBy(username)
         .images(request.getImages())
         .createdDate(System.currentTimeMillis())
         .lut(System.currentTimeMillis())
@@ -111,7 +130,6 @@ public class ProductServiceImpl implements ProductService {
       productAccessor.saveItem(product);
 
       // Log changes
-      String username = SecurityContextHolder.getContext().getAuthentication().getName();
       activityLogService.logActivity(username, "Product inserted: " + request.getName());
       return ResponseEntity.ok(new BaseResponse<>("Product Inserted Successfully"));
     } catch (Exception e) {

@@ -2,6 +2,7 @@ package com.backend.ims.data.product.api.service;
 
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.data.product.api.model.request.ProductRequest;
+import com.backend.ims.general.model.request.ImportCsvRequest;
 import com.backend.ims.general.model.request.PaginationRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -22,6 +23,14 @@ public interface ProductService {
    * @return detailed product information
    */
   ResponseEntity<?> getProductDetail(ProductRequest request);
+
+  /**
+   * This method is used to import product data from csv file
+   *
+   * @param request import csv request
+   * @return base response
+   */
+  ResponseEntity<?> importCsv(ImportCsvRequest request);
 
   /**
    * This method is used to insert new product data

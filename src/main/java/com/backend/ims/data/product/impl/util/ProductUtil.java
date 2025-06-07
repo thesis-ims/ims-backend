@@ -2,10 +2,18 @@ package com.backend.ims.data.product.impl.util;
 
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.general.model.request.SpecFilter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 public class ProductUtil {
 
@@ -47,5 +55,30 @@ public class ProductUtil {
     }
 
     return mutableProducts;
+  }
+
+  public static List<Product> parseCsvToProducts(byte[] csvData, String username) throws IOException {
+    List<Product> products = new ArrayList<>();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(csvData)))) {
+      CSVParser parser = CSVParser.parse(reader, CSVFormat.Builder.create()
+        .setHeader("Name", "Description", "Category", "Buy Price", "Sell Price", "Quantity")
+        .setSkipHeaderRecord(true)
+        .build());
+      for (CSVRecord record : parser) {
+        Product product = Product.builder()
+          .id(UUID.randomUUID().toString()) // Generate a new UUID for the product
+          .name(record.get("Name"))
+          .description(record.get("Description"))
+          .category(record.get("Category"))
+          .buyPrice(Long.parseLong(record.get("Buy Price")))
+          .sellPrice(Long.parseLong(record.get("Sell Price")))
+          .quantity(Integer.parseInt(record.get("Quantity")))
+          .createdDate(System.currentTimeMillis()) // Set current time as creation date
+          .createdBy(username)
+          .build();
+        products.add(product);
+      }
+    }
+    return products;
   }
 }

@@ -50,6 +50,12 @@ public class ProductControllerTest {
     Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
   }
 
+  @Test
+  public void testExportCsv() {
+    Mockito.when(productService.exportCsv()).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
+    ResponseEntity<?> actualResponse = productController.exportCsv();
+    Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
+  }
 
   @Test
   public void testInsertProduct() {

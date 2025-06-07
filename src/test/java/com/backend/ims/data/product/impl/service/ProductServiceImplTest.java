@@ -27,7 +27,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
@@ -349,6 +348,37 @@ public class ProductServiceImplTest {
     Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
+  @Test
+  public void testExportCsv_Success() {
+    Product product = Product.builder()
+      .name("Product 1")
+      .createdBy("mockedUser")
+      .quantity(20)
+      .build();
+    Product product1 = Product.builder()
+      .name("Product 2")
+      .createdBy("mockedUser")
+      .quantity(0)
+      .build();
+
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product, product1));
+    ResponseEntity<?> response = productService.exportCsv();
+
+    String actualBody = response.getBody().toString().trim().replace("\r\n", "\n");
+    String expectedBody = "Name,Description,Category,Buy Price,Sell Price,Quantity\n" +
+      "Product 1,,,0,0,20\n" +
+      "Product 2,,,0,0,0";
+
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(actualBody, expectedBody);
+  }
+
+  @Test
+  public void testExportCsv_Exception() {
+    Mockito.when(productAccessor.getAllItems()).thenThrow(RuntimeException.class);
+    ResponseEntity<?> response = productService.exportCsv();
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 
   @Test
   public void testInsertProduct_RequestNull() {

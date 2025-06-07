@@ -37,6 +37,11 @@ public class ProductController {
     return userService.importCsv(request);
   }
 
+  @PostMapping("/export-csv")
+  public ResponseEntity<?> exportCsv() {
+    return userService.exportCsv();
+  }
+
   @PostMapping("/update")
   public ResponseEntity<?> updateProduct(@RequestBody Product request) {
     return userService.updateProduct(request);

@@ -13,12 +13,15 @@ import com.backend.ims.general.model.request.ImportType;
 import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.general.model.response.MapResponse;
 import com.backend.ims.general.model.response.PaginatedResponse;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +104,28 @@ public class ProductServiceImpl implements ProductService {
       }
       productAccessor.insertAll(products); // Insert all products from the CSV
       return ResponseEntity.ok(new BaseResponse<>("Successfully Import Product Data by " + request.getImportType().name()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
+    }
+  }
+
+  @Override
+  public ResponseEntity<?> exportCsv() {
+    try {
+      // Get the authenticated user's ID
+      String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+      // Fetch all products created by the authenticated user
+      List<Product> allProducts = productAccessor.getAllItems().stream()
+        .filter(product -> username.equals(product.getCreatedBy()))
+        .toList();
+
+      // Generate CSV data
+      StringBuilder csvData = ProductUtil.parseProductsToCsv(allProducts);
+
+      return ResponseEntity.ok()
+        .header("Content-Disposition", "attachment; filename=products.csv")
+        .body(csvData.toString());
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
     }

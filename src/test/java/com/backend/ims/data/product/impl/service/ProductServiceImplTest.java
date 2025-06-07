@@ -344,6 +344,7 @@ public class ProductServiceImplTest {
     Mockito.mockStatic(ProductUtil.class).when(() -> ProductUtil.parseCsvToProducts(Mockito.any(), Mockito.anyString()))
       .thenThrow(RuntimeException.class);
     ResponseEntity<?> response = productService.importCsv(request);
+    Mockito.clearAllCaches();
 
     Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }

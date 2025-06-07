@@ -3,6 +3,7 @@ package com.backend.ims.data.product.impl.controller;
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.data.product.api.model.request.ProductRequest;
 import com.backend.ims.data.product.api.service.ProductService;
+import com.backend.ims.general.model.request.ImportCsvRequest;
 import com.backend.ims.general.model.request.PaginationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class ProductController {
   @PostMapping("/get-product-detail")
   public ResponseEntity<?> getProductDetail(@RequestBody ProductRequest request) {
     return userService.getProductDetail(request);
+  }
+
+  @PostMapping("/import-csv")
+  public ResponseEntity<?> importCsv(@RequestBody ImportCsvRequest request) {
+    return userService.importCsv(request);
   }
 
   @PostMapping("/update")

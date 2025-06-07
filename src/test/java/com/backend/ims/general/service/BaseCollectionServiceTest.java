@@ -93,17 +93,6 @@ public class BaseCollectionServiceTest {
   }
 
   @Test
-  public void deleteAllUsers_CallsRemoveWithEmptyQuery() {
-    service.deleteAllUsers();
-
-    ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-    Mockito.verify(mongoTemplate).remove(queryCaptor.capture(), Mockito.eq(COLLECTION_NAME));
-
-    Query actualQuery = queryCaptor.getValue();
-    Assert.assertTrue(actualQuery.getQueryObject().isEmpty());
-  }
-
-  @Test
   public void getByFilter_CallsFindOneWithCorrectQuery() {
     String key = "name";
     String value = "John";
@@ -154,6 +143,30 @@ public class BaseCollectionServiceTest {
     Document criteria = capturedQuery.getQueryObject();
 
     Assert.assertEquals(value, criteria.get(key));
+  }
+
+  @Test
+  public void deleteAll_CallsRemoveWithCorrectQueryAndParameters() {
+    String username = "testUser";
+    service.deleteAll(username);
+
+    ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+    Mockito.verify(mongoTemplate).remove(queryCaptor.capture(), Mockito.eq(service.getEntityClass()), Mockito.eq(COLLECTION_NAME));
+
+    Query actualQuery = queryCaptor.getValue();
+    Document actualCriteria = actualQuery.getQueryObject();
+
+    Document expectedCriteria = new Document("createdBy", username);
+
+    Assert.assertEquals(actualCriteria, expectedCriteria);
+  }
+
+  @Test
+  public void insertAll_CallsInsertWithCorrectParameters() {
+    List<User> users = List.of(new User(), new User());
+    service.insertAll(users);
+
+    Mockito.verify(mongoTemplate).insert(users, COLLECTION_NAME);
   }
   private static class User {
   }

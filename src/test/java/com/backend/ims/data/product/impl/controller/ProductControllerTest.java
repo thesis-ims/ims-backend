@@ -3,6 +3,7 @@ package com.backend.ims.data.product.impl.controller;
 import com.backend.ims.data.product.api.model.Product;
 import com.backend.ims.data.product.api.model.request.ProductRequest;
 import com.backend.ims.data.product.api.service.ProductService;
+import com.backend.ims.general.model.request.ImportCsvRequest;
 import com.backend.ims.general.model.request.PaginationRequest;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -39,6 +40,13 @@ public class ProductControllerTest {
   public void testGetProductDetail() {
     Mockito.when(productService.getProductDetail(Mockito.any())).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
     ResponseEntity<?> actualResponse = productController.getProductDetail(new ProductRequest());
+    Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
+  }
+
+  @Test
+  public void testImportCsv() {
+    Mockito.when(productService.importCsv(Mockito.any())).thenReturn(new ResponseEntity<>(HttpStatusCode.valueOf(200)));
+    ResponseEntity<?> actualResponse = productController.importCsv(new ImportCsvRequest());
     Assert.assertEquals(actualResponse.getStatusCode(), HttpStatus.OK);
   }
 

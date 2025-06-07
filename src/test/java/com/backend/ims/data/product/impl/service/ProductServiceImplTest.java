@@ -6,7 +6,10 @@ import com.backend.ims.data.product.api.model.request.ProductRequest;
 import com.backend.ims.data.product.api.model.response.StockSummary;
 import com.backend.ims.data.product.api.service.ProductService;
 import com.backend.ims.data.product.impl.accessor.ProductAccessor;
+import com.backend.ims.data.product.impl.util.ProductUtil;
 import com.backend.ims.general.model.BaseResponse;
+import com.backend.ims.general.model.request.ImportCsvRequest;
+import com.backend.ims.general.model.request.ImportType;
 import com.backend.ims.general.model.request.PaginationRequest;
 import com.backend.ims.general.model.request.SpecFilter;
 import com.backend.ims.general.model.response.MapResponse;
@@ -310,6 +313,41 @@ public class ProductServiceImplTest {
     ResponseEntity<?> response = productService.getProductDetail(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
+  @Test
+  public void testImportCsv_SuccessWithReplace() {
+    ImportCsvRequest request = new ImportCsvRequest();
+    request.setImportType(ImportType.REPLACE);
+    request.setCsvData("Name,Description,Category,Buy Price,Sell Price,Quantity\nProduct 1,Desc,Cat,10,20,5".getBytes());
+    ResponseEntity<?> response = productService.importCsv(request);
+
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Import Product Data by REPLACE");
+  }
+
+  @Test
+  public void testImportCsv_SuccessWithAppend() {
+    ImportCsvRequest request = new ImportCsvRequest();
+    request.setImportType(ImportType.APPEND);
+    request.setCsvData("Name,Description,Category,Buy Price,Sell Price,Quantity\nProduct 1,Desc,Cat,10,20,5".getBytes());
+    ResponseEntity<?> response = productService.importCsv(request);
+
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Import Product Data by APPEND");
+  }
+
+  @Test
+  public void testImportCsv_Exception() {
+    ImportCsvRequest request = new ImportCsvRequest();
+    request.setImportType(ImportType.APPEND);
+    request.setCsvData("Name,Description,Category,Buy Price,Sell Price,Quantity\nProduct 1,Desc,Cat,10,20,5".getBytes());
+    Mockito.mockStatic(ProductUtil.class).when(() -> ProductUtil.parseCsvToProducts(Mockito.any(), Mockito.anyString()))
+      .thenThrow(RuntimeException.class);
+    ResponseEntity<?> response = productService.importCsv(request);
+
+    Assert.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
 
   @Test
   public void testInsertProduct_RequestNull() {

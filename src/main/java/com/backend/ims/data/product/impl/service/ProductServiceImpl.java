@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
         .total(filteredProducts.size())
         .page(page)
         .size(size)
-        .totalPages((int) Math.ceil((double) allProducts.size() / size))
+        .totalPages((int) Math.ceil((double) filteredProducts.size() / size))
         .build();
 
       return ResponseEntity.ok(new BaseResponse<>("Successfully Getting All Product Data", response));

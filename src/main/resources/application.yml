@@ -24,12 +24,3 @@ server:
     key-store-password: imsbackend
     key-store-type: PKCS12
     key-alias: ims
-logging:
-  level:
-    root: INFO
-    com:
-      backend: DEBUG
-    org:
-      springframework:
-        data:
-          mongodb: DEBUG

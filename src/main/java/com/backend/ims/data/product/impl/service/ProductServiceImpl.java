@@ -174,27 +174,27 @@ public class ProductServiceImpl implements ProductService {
       }
       // Compare original and updated product
       StringBuilder changes = new StringBuilder();
-      if (!product.getName().equals(request.getName())) {
+      if (!request.getName().equals(product.getName())) {
         changes.append("Name changed from '").append(product.getName())
           .append("' to '").append(request.getName()).append("'. ");
       }
-      if (!product.getDescription().equals(request.getDescription())) {
+      if (!request.getDescription().equals(product.getDescription())) {
         changes.append("Description changed from '").append(product.getDescription())
           .append("' to '").append(request.getDescription()).append("'. ");
       }
-      if (!product.getCategory().equals(request.getCategory())) {
+      if (!request.getCategory().equals(product.getCategory())) {
         changes.append("Category changed from '").append(product.getCategory())
           .append("' to '").append(request.getCategory()).append("'. ");
       }
-      if (product.getBuyPrice() != request.getBuyPrice()) {
+      if (request.getBuyPrice() != product.getBuyPrice()) {
         changes.append("Buy price changed from ").append(product.getBuyPrice())
           .append(" to ").append(request.getBuyPrice()).append(". ");
       }
-      if (product.getSellPrice() != request.getSellPrice()) {
+      if (request.getSellPrice() != product.getSellPrice()) {
         changes.append("Sell price changed from ").append(product.getSellPrice())
           .append(" to ").append(request.getSellPrice()).append(". ");
       }
-      if (product.getQuantity() != request.getQuantity()) {
+      if (request.getQuantity() != product.getQuantity()) {
         changes.append("Quantity changed from ").append(product.getQuantity())
           .append(" to ").append(request.getQuantity()).append(". ");
       }

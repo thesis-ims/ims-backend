@@ -103,6 +103,7 @@ public class ProductServiceImpl implements ProductService {
         productAccessor.deleteAll(username); // Delete all products created by the user before importing
       }
       productAccessor.insertAll(products); // Insert all products from the CSV
+      activityLogService.logActivity(username, "Product data imported using " + request.getImportType().name());
       return ResponseEntity.ok(new BaseResponse<>("Successfully Import Product Data by " + request.getImportType().name()));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
@@ -174,17 +175,38 @@ public class ProductServiceImpl implements ProductService {
       }
       // Compare original and updated product
       StringBuilder changes = new StringBuilder();
-      if (!request.getName().equals(product.getName())) {
-        changes.append("Name changed from '").append(product.getName())
-          .append("' to '").append(request.getName()).append("'. ");
+      changes.append("Changes on product ").append(product.getName()).append(": ");
+      if (request.getName() != null && !request.getName().equals(product.getName())) {
+        if (product.getName() == null) {
+          changes.append("Name changed from 'null' to '").append(request.getName()).append("'. ");
+        } else {
+          changes.append("Name changed from '").append(product.getName())
+            .append("' to '").append(request.getName()).append("'. ");
+        }
+      } else if (request.getName() == null && product.getName() != null) {
+        changes.append("Name changed from '").append(product.getName()).append("' to 'null'. ");
       }
-      if (!request.getDescription().equals(product.getDescription())) {
-        changes.append("Description changed from '").append(product.getDescription())
-          .append("' to '").append(request.getDescription()).append("'. ");
+
+      if (request.getDescription() != null && !request.getDescription().equals(product.getDescription())) {
+        if (product.getDescription() == null) {
+          changes.append("Description changed from 'null' to '").append(request.getDescription()).append("'. ");
+        } else {
+          changes.append("Description changed from '").append(product.getDescription())
+            .append("' to '").append(request.getDescription()).append("'. ");
+        }
+      } else if (request.getDescription() == null && product.getDescription() != null) {
+        changes.append("Description changed from '").append(product.getDescription()).append("' to 'null'. ");
       }
-      if (!request.getCategory().equals(product.getCategory())) {
-        changes.append("Category changed from '").append(product.getCategory())
-          .append("' to '").append(request.getCategory()).append("'. ");
+
+      if (request.getCategory() != null && !request.getCategory().equals(product.getCategory())) {
+        if (product.getCategory() == null) {
+          changes.append("Category changed from 'null' to '").append(request.getCategory()).append("'. ");
+        } else {
+          changes.append("Category changed from '").append(product.getCategory())
+            .append("' to '").append(request.getCategory()).append("'. ");
+        }
+      } else if (request.getCategory() == null && product.getCategory() != null) {
+        changes.append("Category changed from '").append(product.getCategory()).append("' to 'null'. ");
       }
       if (request.getBuyPrice() != product.getBuyPrice()) {
         changes.append("Buy price changed from ").append(product.getBuyPrice())
@@ -207,11 +229,10 @@ public class ProductServiceImpl implements ProductService {
       product.setQuantity(request.getQuantity());
       product.setImages(request.getImages());
       product.setLut(System.currentTimeMillis());
-      productAccessor.saveItem(product);
-
       // Log changes
       String username = SecurityContextHolder.getContext().getAuthentication().getName();
       activityLogService.logActivity(username, "Product updated: " + changes);
+      productAccessor.saveItem(product);
       return ResponseEntity.ok(new BaseResponse<>("Successfully Update Product Data"));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));
@@ -224,6 +245,10 @@ public class ProductServiceImpl implements ProductService {
       if (request == null || request.getProductId() == null) {
         return ResponseEntity.badRequest().body(new BaseResponse<>("Error: Request is null!"));
       }
+      activityLogService.logActivity(
+        SecurityContextHolder.getContext().getAuthentication().getName(),
+        "Product deleted with ID: " + request.getProductId()
+      );
       productAccessor.deleteItem(request.getProductId());
       return ResponseEntity.ok(new BaseResponse<>("Successfully Delete Product Data"));
     } catch (Exception e) {

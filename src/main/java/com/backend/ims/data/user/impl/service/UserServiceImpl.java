@@ -1,5 +1,9 @@
 package com.backend.ims.data.user.impl.service;
 
+import com.backend.ims.data.activitylog.api.model.ActivityLog;
+import com.backend.ims.data.activitylog.impl.accessor.ActivityLogAccessor;
+import com.backend.ims.data.product.api.model.Product;
+import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.data.user.api.common.UserCommon;
 import com.backend.ims.data.user.api.model.User;
 import com.backend.ims.data.user.api.model.request.UpdateRoleRequest;
@@ -21,10 +25,16 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
   private final UserAccessor userAccessor;
+  private final ProductAccessor productAccessor;
+  private final ActivityLogAccessor activityLogAccessor;
 
   @Autowired
-  public UserServiceImpl(UserAccessor userAccessor) {
+  public UserServiceImpl(UserAccessor userAccessor,
+                         ProductAccessor productAccessor,
+                         ActivityLogAccessor activityLogAccessor) {
     this.userAccessor = userAccessor;
+    this.productAccessor = productAccessor;
+    this.activityLogAccessor = activityLogAccessor;
   }
 
   @Override
@@ -103,6 +113,23 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity
           .badRequest()
           .body(new BaseResponse<>(String.format("Error: Email %s is already in use!", request.getEmail())));
+      }
+
+      if (!user.getUsername().equals(request.getUsername())) {
+        List<Product> products = productAccessor.getAllItems().stream().filter(
+          product -> product.getCreatedBy() != null && product.getCreatedBy().equals(user.getUsername()))
+          .toList();
+        products.forEach(product -> {
+          product.setCreatedBy(request.getUsername());
+        });
+        productAccessor.insertAll(products);
+        List<ActivityLog> activityLogs = activityLogAccessor.getAllItems().stream().filter(
+          activityLog -> activityLog.getUsername() != null && activityLog.getUsername().equals(user.getUsername()))
+          .toList();
+        activityLogs.forEach(activityLog -> {
+          activityLog.setUsername(request.getUsername());
+        });
+        activityLogAccessor.insertAll(activityLogs);
       }
 
       user.setEmail(request.getEmail());

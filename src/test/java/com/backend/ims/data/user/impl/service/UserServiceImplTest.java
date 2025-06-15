@@ -1,5 +1,9 @@
 package com.backend.ims.data.user.impl.service;
 
+import com.backend.ims.data.activitylog.api.model.ActivityLog;
+import com.backend.ims.data.activitylog.impl.accessor.ActivityLogAccessor;
+import com.backend.ims.data.product.api.model.Product;
+import com.backend.ims.data.product.impl.accessor.ProductAccessor;
 import com.backend.ims.data.user.api.model.User;
 import com.backend.ims.data.user.api.model.request.UpdateRoleRequest;
 import com.backend.ims.data.user.api.model.request.UserRequest;
@@ -27,6 +31,11 @@ public class UserServiceImplTest {
   private UserAccessor userAccessor;
 
   @Mock
+  private ProductAccessor productAccessor;
+  @Mock
+  private ActivityLogAccessor activityLogAccessor;
+
+  @Mock
   private MongoTemplate mongoTemplate;
 
   private UserService userService;
@@ -34,7 +43,7 @@ public class UserServiceImplTest {
   @BeforeMethod(alwaysRun = true)
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    userService = new UserServiceImpl(userAccessor);
+    userService = new UserServiceImpl(userAccessor, productAccessor, activityLogAccessor);
   }
 
   @Test
@@ -159,10 +168,19 @@ public class UserServiceImplTest {
   public void testUpdateUser_Success() {
     UserRequest request = new UserRequest();
     request.setUserId("123");
-    Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(new User());
+    request.setUsername("existingUsers");
+    User existingUser = new User();
+    existingUser.setUsername("existingUser");
+    Product product = new Product();
+    product.setCreatedBy("existingUser");
+    ActivityLog activityLog = new ActivityLog();
+    activityLog.setUsername("existingUser");
+    Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(existingUser);
     Mockito.when(userAccessor.isExist(Mockito.anyString(), Mockito.anyString()))
       .thenReturn(false)
       .thenReturn(false);
+    Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product));
+    Mockito.when(activityLogAccessor.getAllItems()).thenReturn(List.of(activityLog));
     ResponseEntity<?> response = userService.updateUser(request);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Update User Data");

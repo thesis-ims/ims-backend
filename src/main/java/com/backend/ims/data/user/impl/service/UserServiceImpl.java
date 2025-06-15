@@ -117,19 +117,19 @@ public class UserServiceImpl implements UserService {
 
       if (!user.getUsername().equals(request.getUsername())) {
         List<Product> products = productAccessor.getAllItems().stream().filter(
-          product -> product.getCreatedBy() != null && product.getCreatedBy().equals(user.getUsername()))
+            product -> product.getCreatedBy() != null && product.getCreatedBy().equals(user.getUsername()))
           .toList();
         products.forEach(product -> {
           product.setCreatedBy(request.getUsername());
+          productAccessor.saveItem(product);
         });
-        productAccessor.insertAll(products);
         List<ActivityLog> activityLogs = activityLogAccessor.getAllItems().stream().filter(
-          activityLog -> activityLog.getUsername() != null && activityLog.getUsername().equals(user.getUsername()))
+            activityLog -> activityLog.getUsername() != null && activityLog.getUsername().equals(user.getUsername()))
           .toList();
         activityLogs.forEach(activityLog -> {
           activityLog.setUsername(request.getUsername());
+          activityLogAccessor.saveItem(activityLog);
         });
-        activityLogAccessor.insertAll(activityLogs);
       }
 
       user.setEmail(request.getEmail());

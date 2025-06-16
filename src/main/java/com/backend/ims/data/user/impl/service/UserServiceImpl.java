@@ -17,6 +17,11 @@ import com.backend.ims.general.model.response.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -139,6 +144,16 @@ public class UserServiceImpl implements UserService {
       user.setDob(request.getDob());
       user.setImage(request.getImage());
       userAccessor.saveItem(user);
+      // Update authentication in SecurityContext
+      UserDetails updatedUserDetails = org.springframework.security.core.userdetails.User.builder()
+        .username(user.getUsername())
+        .password("") // Password is not required here
+        .authorities(user.getRoles().stream().map(SimpleGrantedAuthority::new).toList())
+        .build();
+      UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(
+        updatedUserDetails, null, updatedUserDetails.getAuthorities());
+      SecurityContextHolder.getContext().setAuthentication(newAuthentication);
+
       return ResponseEntity.ok(new BaseResponse<>("Successfully Update User Data"));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BaseResponse<>(e.getMessage()));

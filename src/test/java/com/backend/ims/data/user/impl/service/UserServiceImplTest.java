@@ -18,6 +18,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -166,15 +168,23 @@ public class UserServiceImplTest {
 
   @Test
   public void testUpdateUser_Success() {
+    // Arrange
     UserRequest request = new UserRequest();
     request.setUserId("123");
-    request.setUsername("existingUsers");
+    request.setUsername("updatedUsername");
+    request.setEmail("updatedEmail@example.com");
+
     User existingUser = new User();
-    existingUser.setUsername("existingUser");
+    existingUser.setUsername("existingUsername");
+    existingUser.setEmail("existingEmail@example.com");
+    existingUser.setRoles(List.of("ROLE_USER"));
+
     Product product = new Product();
-    product.setCreatedBy("existingUser");
+    product.setCreatedBy("existingUsername");
+
     ActivityLog activityLog = new ActivityLog();
-    activityLog.setUsername("existingUser");
+    activityLog.setUsername("existingUsername");
+
     Mockito.when(userAccessor.getItemById(Mockito.anyString())).thenReturn(existingUser);
     Mockito.when(userAccessor.isExist(Mockito.anyString(), Mockito.anyString()))
       .thenReturn(false)
@@ -182,8 +192,14 @@ public class UserServiceImplTest {
     Mockito.when(productAccessor.getAllItems()).thenReturn(List.of(product));
     Mockito.when(activityLogAccessor.getAllItems()).thenReturn(List.of(activityLog));
     ResponseEntity<?> response = userService.updateUser(request);
+    // Assert
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     Assert.assertEquals(((BaseResponse) response.getBody()).getMessage(), "Successfully Update User Data");
+
+    // Verify that the SecurityContextHolder is updated with the new username
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Assert.assertNotNull(authentication);
+    Assert.assertEquals(authentication.getName(), "updatedUsername");
   }
 
   @Test

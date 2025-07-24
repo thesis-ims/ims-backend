@@ -17,5 +17,4 @@ public class PaginatedResponse<T> {
   private int page;
   private int size;
   private int totalPages;
-  private Object otherInfo;
 }

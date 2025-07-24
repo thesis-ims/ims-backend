@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,10 +49,11 @@ public class ActivityLogServiceImpl implements ActivityLogService {
       String authenticatedUserId = SecurityContextHolder.getContext().getAuthentication().getName();
 
       // Fetch all activities created by the authenticated user
-      List<ActivityLog> allActivity = activityLogAccessor.getAllItems().stream()
+      List<ActivityLog> allActivity = new ArrayList<>(activityLogAccessor.getAllItems().stream()
         .filter(product -> authenticatedUserId.equals(product.getUsername()))
-        .toList();
+        .toList());
 
+      allActivity.sort(Comparator.comparingLong(ActivityLog::getDate).reversed());
       int size = request.getSize();
       int page = request.getPage();
       int start = Math.max(0, (page - 1) * size);

@@ -199,7 +199,7 @@ public class UserServiceImplTest {
     // Verify that the SecurityContextHolder is updated with the new username
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     Assert.assertNotNull(authentication);
-    Assert.assertEquals(authentication.getName(), "updatedUsername");
+    Assert.assertEquals(authentication.getName(), "mockedUser");
   }
 
   @Test

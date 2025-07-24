@@ -48,11 +48,11 @@ public class ProductServiceImpl implements ProductService {
       }
 
       // Get the authenticated user's ID
-      String authenticatedUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+      String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 
       // Fetch all products created by the authenticated user
       List<Product> allProducts = productAccessor.getAllItems().stream()
-        .filter(product -> authenticatedUserId.equals(product.getCreatedBy()))
+        .filter(product -> userName.equals(product.getCreatedBy()))
         .toList();
 
       List<Product> filteredProducts = ProductUtil.filterProducts(allProducts, request.getFilter());
